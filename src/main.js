@@ -31,7 +31,6 @@ render(mainElement, createFilmsTemplate());
 const filmListElement = mainElement.querySelector('.films');
 
 render(filmListElement, createDefaultFilmsTemplate());
-render(filmListElement, createShowMoreTemplate());
 render(filmListElement, createRatedFilmsTemplate());
 render(filmListElement, createCommentedFilmsTemplate());
 
@@ -48,6 +47,7 @@ const renderSeveralFilms = (count, container) => {
 };
 
 renderSeveralFilms(DEFAULT_FILMS_COUNT, defaultFilmsElement);
+render(defaultFilmsElement, createShowMoreTemplate());
 
 renderSeveralFilms(SPECIAL_FILMS_COUNT, ratedFilmsElement);
 renderSeveralFilms(SPECIAL_FILMS_COUNT, commentedFilmsElement);
