@@ -1,6 +1,6 @@
 const filmsToFilterMap = {
   AllMovies: (films) => films.length,
-  Watchlist: (films) => films.filter((film) => film.isOnWatchlist).length,
+  Watchlist: (films) => films.filter((film) => film.isInWatchlist).length,
   History: (films) => films.filter((film) => film.isWatched).length,
   Favorites: (films) => films.filter((film) => film.isFavorite).length,
 };

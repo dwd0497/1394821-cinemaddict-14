@@ -1,4 +1,3 @@
-
 import {getRandomIntInclusive, getRandomArrayKey, getRandomLengthArray, getRandomYear, getRandomDate} from '../utils.js';
 
 const titles = [
@@ -21,7 +20,7 @@ const postersSrc = [
   './images/posters/the-man-with-the-golden-arm.jpg',
 ];
 
-const countrys = [
+const countries = [
   'made-for-each-other',
   'popeye-meets-sinbad',
   'sagebrush-trail',
@@ -31,7 +30,7 @@ const countrys = [
   'the-man-with-the-golden-arm',
 ];
 
-const people = [
+const actors = [
   'Leonardo DiCaprio',
   'Tobey Maguire',
   'Carey Mulligan',
@@ -45,6 +44,27 @@ const people = [
   'Callan McAuliffe',
   'Gus Murray',
   'Stephen James King',
+];
+
+const producers = [
+  'Nigel Gostelow',
+  'Justin Springer',
+  'Jason Blum',
+  'Jerry Bruckheimer',
+  'Dana Brunetti',
+  'Peter Chernin',
+  'Megan Ellison',
+  'Wyck Godfrey',
+];
+
+const screenwriters = [
+  'Woody Allen',
+  'Akira Kurosawa',
+  'Charles Chaplin',
+  'Billy Wilder',
+  'Paul Schrader',
+  'Neil Simon',
+  'Francis Ford Coppola',
 ];
 
 const genres = [
@@ -69,17 +89,17 @@ export const generateFilm = () => {
     ageRating: getRandomIntInclusive(0, 18),
     releaseDate: getRandomDate(),
     releaseYear: getRandomYear(),
-    country: getRandomArrayKey(countrys),
-    producer: getRandomArrayKey(people),
-    screenwriters: getRandomLengthArray(people),
-    cast: getRandomLengthArray(people),
+    country: getRandomArrayKey(countries),
+    producer: getRandomArrayKey(producers),
+    screenwriters: getRandomLengthArray(screenwriters),
+    cast: getRandomLengthArray(actors),
     duration: `${getRandomIntInclusive(0, 8)}h ${getRandomIntInclusive(0, 59)}m`,
     genres: getRandomLengthArray(genres),
     shortDescription: getRandomLengthArray(description).join('. '),
     description: getRandomLengthArray(description).join('. '),
-    comments: [1, 2, 3, 4],
+    comments: new Array(getRandomIntInclusive(0, 4)).fill().map((item, i) => i),
     isWatched: Boolean(getRandomIntInclusive(0, 1)),
     isFavorite: Boolean(getRandomIntInclusive(0, 1)),
-    isOnWatchlist: Boolean(getRandomIntInclusive(0, 1)),
+    isInWatchlist: Boolean(getRandomIntInclusive(0, 1)),
   };
 };

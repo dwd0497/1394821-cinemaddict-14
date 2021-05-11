@@ -1,9 +1,10 @@
 const restrictСharacters = (string) => {
-  return string.length < 138 ? string : `${string.substr(0, 138)} ...`;
+  const MAX_STRING_LENGTH = 138;
+  return string.length < MAX_STRING_LENGTH ? string : `${string.substring(0, MAX_STRING_LENGTH)} ...`;
 };
 
 export const createFilmTemplate = (film) => {
-  const {title, rating, releaseYear, duration, genres, poster, shortDescription, isWatched, isFavorite, isOnWatchlist, comments} = film;
+  const {title, rating, releaseYear, duration, genres, poster, shortDescription, isWatched, isFavorite, isInWatchlist, comments} = film;
 
   const activeClassName = (flag) => {
     return flag ? 'film-card__controls-item--active' : '';
@@ -22,7 +23,7 @@ export const createFilmTemplate = (film) => {
         <p class="film-card__description">${restrictСharacters(shortDescription)}</p>
         <a class="film-card__comments">${comments.length} comments</a>
         <div class="film-card__controls">
-            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist  ${activeClassName(isOnWatchlist)}" type="button">Add to watchlist</button>
+            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist  ${activeClassName(isInWatchlist)}" type="button">Add to watchlist</button>
             <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${activeClassName(isWatched)}" type="button">Mark as watched</button>
             <button class="film-card__controls-item button film-card__controls-item--favorite ${activeClassName(isFavorite)}" type="button">Mark as favorite</button>
         </div>
