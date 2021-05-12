@@ -1,4 +1,4 @@
-import {getRandomDate, getRandomArrayKey} from '../utils.js';
+import {getRandomDate, getRandomArrayValue, emotions} from '../utils.js';
 
 const NUMBER_OF_COMMENTS = 5;
 
@@ -25,28 +25,21 @@ const people = [
   'Stephen James King',
 ];
 
-const emotions = [
-  'smile',
-  'sleeping',
-  'puke',
-  'angry',
-];
-
 const generateComment = (id) => {
   return {
-    author: getRandomArrayKey(people),
-    text: getRandomArrayKey(comments),
+    author: getRandomArrayValue(people),
+    text: getRandomArrayValue(comments),
     date: getRandomDate(),
-    emotion: getRandomArrayKey(emotions),
+    emotion: getRandomArrayValue(emotions),
     id: id,
   };
 };
 
 export const generateComments = () => {
-  const comments = [];
-  for (let i = 1; i < NUMBER_OF_COMMENTS; i++) { // выведет 0, затем 1, затем 2
+  const commentsList = [];
+  for (let i = 1; i < NUMBER_OF_COMMENTS; i++) {
     const comment = generateComment(i);
-    comments.push(comment);
+    commentsList.push(comment);
   }
-  return comments;
+  return commentsList;
 };

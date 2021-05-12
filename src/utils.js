@@ -6,7 +6,7 @@ export const getRandomIntInclusive = (min = 0, max = 1) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-export const getRandomArrayKey = (array) => {
+export const getRandomArrayValue = (array) => {
   return array[getRandomIntInclusive(0, array.length - 1)];
 };
 
@@ -25,4 +25,9 @@ export const getRandomDate = () => {
   return dayjs().add(getRandomIntInclusive(-  15000, 0), 'day').format('DD MMMM YYYY');
 };
 
-
+export const emotions = [
+  'smile',
+  'sleeping',
+  'puke',
+  'angry',
+];

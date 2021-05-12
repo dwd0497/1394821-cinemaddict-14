@@ -1,13 +1,8 @@
-const getEmojisTemplate = () => {
+import {emotions} from '../utils.js';
 
-  const emotions = [
-    'smile',
-    'sleeping',
-    'puke',
-    'angry',
-  ];
+const getEmojisTemplate = (emotionsList) => {
 
-  return emotions.map((emotion) => {
+  return emotionsList.map((emotion) => {
     return (`
       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
       <label class="film-details__emoji-label" for="emoji-${emotion}">
@@ -149,7 +144,7 @@ export const createPopupTemplate = (film, comments) => {
                     </label>
 
                     <div class="film-details__emoji-list">
-                      ${getEmojisTemplate()}
+                      ${getEmojisTemplate(emotions)}
                     </div>
                 </div>
                 </section>

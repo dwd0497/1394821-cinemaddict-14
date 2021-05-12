@@ -1,4 +1,4 @@
-import {getRandomIntInclusive, getRandomArrayKey, getRandomLengthArray, getRandomYear, getRandomDate} from '../utils.js';
+import {getRandomIntInclusive, getRandomArrayValue, getRandomLengthArray, getRandomYear, getRandomDate} from '../utils.js';
 
 const titles = [
   'Made for each other',
@@ -81,16 +81,16 @@ const description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cr
 
 export const generateFilm = () => {
   return {
-    title: getRandomArrayKey(titles),
-    originalTtitle: getRandomArrayKey(titles),
-    poster: getRandomArrayKey(postersSrc),
-    fullcreanPoster: getRandomArrayKey(postersSrc),
+    title: getRandomArrayValue(titles),
+    originalTtitle: getRandomArrayValue(titles),
+    poster: getRandomArrayValue(postersSrc),
+    fullcreanPoster: getRandomArrayValue(postersSrc),
     rating: getRandomIntInclusive(0, 10),
     ageRating: getRandomIntInclusive(0, 18),
     releaseDate: getRandomDate(),
     releaseYear: getRandomYear(),
-    country: getRandomArrayKey(countries),
-    producer: getRandomArrayKey(producers),
+    country: getRandomArrayValue(countries),
+    producer: getRandomArrayValue(producers),
     screenwriters: getRandomLengthArray(screenwriters),
     cast: getRandomLengthArray(actors),
     duration: `${getRandomIntInclusive(0, 8)}h ${getRandomIntInclusive(0, 59)}m`,
