@@ -1,9 +1,11 @@
+import {createElement} from '../utils.js';
+
 const restrictСharacters = (string) => {
   const MAX_STRING_LENGTH = 138;
   return string.length < MAX_STRING_LENGTH ? string : `${string.substring(0, MAX_STRING_LENGTH)} ...`;
 };
 
-export const createFilmTemplate = (film) => {
+const createFilmTemplate = (film) => {
   const {title, rating, releaseYear, duration, genres, poster, shortDescription, isWatched, isFavorite, isInWatchlist, comments} = film;
 
   const activeClassName = (flag) => {
@@ -30,3 +32,26 @@ export const createFilmTemplate = (film) => {
     </article>
   `);
 };
+
+export default class Film {
+  constructor(film) {
+    this._element = null;
+    this._film = film;
+  }
+
+  getTemplate() {
+    return createFilmTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

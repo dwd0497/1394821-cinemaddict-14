@@ -1,7 +1,6 @@
-import {emotions} from '../utils.js';
+import {emotions, createElement} from '../utils.js';
 
 const getEmojisTemplate = (emotionsList) => {
-
   return emotionsList.map((emotion) => {
     return (`
       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
@@ -48,7 +47,7 @@ const getCommentsTemplate = (comments) => {
   }).join('');
 };
 
-export const createPopupTemplate = (film, comments) => {
+const createPopupTemplate = (film, comments) => {
   const {title, originalTtitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist} = film;
 
   const addCheckAttribute = (flag) => {
@@ -153,3 +152,27 @@ export const createPopupTemplate = (film, comments) => {
         </section>
   `);
 };
+
+export default class Popup {
+  constructor(film, comments) {
+    this._element = null;
+    this._film = film;
+    this._comments = comments;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._film, this._comments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

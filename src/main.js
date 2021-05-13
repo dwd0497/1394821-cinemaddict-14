@@ -1,19 +1,21 @@
-import {createMenuTemplate} from './view/menu.js';
-import {createUserTemplate} from './view/user.js';
-import {createSortTemplate} from './view/sort.js';
-import {createFilmTemplate} from './view/film.js';
-import {createFilmsContainerTemplate} from './view/films-container.js';
-import {createDefaultFilmsTemplate} from './view/default-films.js';
-import {createRatedFilmsTemplate} from './view/rated-films';
-import {createCommentedFilmsTemplate} from './view/commented-films.js';
-import {createFilmsTemplate} from './view/films.js';
-import {createShowMoreTemplate} from './view/show-more.js';
-import {createPopupTemplate} from './view/popup.js';
-import {createStatisticsTemplate} from './view/statistics.js';
+import MenuView from './view/menu.js';
+import UserView from './view/user.js';
+import SortView from './view/sort.js';
+import FilmView from './view/film.js';
+import FilmsContainerView from './view/films-container.js';
+import DefaultFilmsView from './view/default-films.js';
+import RatedFilmsView from './view/rated-films';
+import CommentedFilmsView from './view/commented-films.js';
+import FilmsView from './view/films.js';
+import ShowMoreView from './view/show-more.js';
+import PopupView from './view/popup.js';
+import StatisticsView from './view/statistics.js';
 
 import {generateFilm} from './mock/film.js';
 import {generateFilters} from './mock/filter.js';
 import {generateComments} from './mock/comment.js';
+
+import {render} from './utils.js';
 
 const FILMS_COUNT = 20;
 const DEFAULT_FILMS_COUNT = 5;
@@ -28,61 +30,91 @@ const headerElement = document.querySelector('.header');
 const footerElement = document.querySelector('.footer');
 const statisticsElement = footerElement.querySelector('.footer__statistics');
 
-const render = (container, template, place = 'beforeend') => {
-  container.insertAdjacentHTML(place, template);
-};
+render(headerElement, new UserView().getElement());
+render(mainElement, new MenuView(filters).getElement());
+render(mainElement, new SortView().getElement());
 
-render(headerElement, createUserTemplate());
-render(mainElement, createMenuTemplate(filters));
-render(mainElement, createSortTemplate());
-render(mainElement, createFilmsTemplate());
+const filmsComponent = new FilmsView();
+render(mainElement, filmsComponent.getElement());
 
-const filmListElement = mainElement.querySelector('.films');
+const defaultFilmsComponent = new DefaultFilmsView();
+const ratedFilmsComponent = new RatedFilmsView();
+const commentedFilmsComponent = new CommentedFilmsView();
 
-render(filmListElement, createDefaultFilmsTemplate());
-render(filmListElement, createRatedFilmsTemplate());
-render(filmListElement, createCommentedFilmsTemplate());
-
-const defaultFilmsElement = filmListElement.querySelector('#default');
-const ratedFilmsElement = filmListElement.querySelector('#rated');
-const commentedFilmsElement = filmListElement.querySelector('#commented');
+render(filmsComponent.getElement(), defaultFilmsComponent.getElement());
+render(filmsComponent.getElement(), ratedFilmsComponent.getElement());
+render(filmsComponent.getElement(), commentedFilmsComponent.getElement());
 
 const renderSeveralFilms = (count, container, films) => {
-  render(container, createFilmsContainerTemplate());
+  const FilmsContainerComponent = new FilmsContainerView();
+  render(container, FilmsContainerComponent.getElement());
 
-  const filmsContainerElement = container.querySelector('.films-list__container');
+  const renderFilm = (film) => {
+    const filmComponent = new FilmView(film);
+    const PopupComponent = new PopupView(film, comments);
+
+    const openPopup = () => {
+      footerElement.appendChild(PopupComponent.getElement());
+      document.body.classList.add('hide-overflow');
+
+    };
+
+    const closePopup = () => {
+      footerElement.removeChild(PopupComponent.getElement());
+      document.body.classList.remove('hide-overflow');
+
+    };
+
+    filmComponent.getElement().querySelector('.film-card__poster').addEventListener('click', () => {
+      openPopup();
+    });
+
+    filmComponent.getElement().querySelector('.film-card__title').addEventListener('click', () => {
+      openPopup();
+    });
+
+    filmComponent.getElement().querySelector('.film-card__comments').addEventListener('click', () => {
+      openPopup();
+    });
+
+    PopupComponent.getElement().querySelector('.film-details__close-btn').addEventListener('click', () => {
+      closePopup();
+    });
+
+    render(FilmsContainerComponent.getElement(), filmComponent.getElement());
+  };
 
   for (let i = 0; i < Math.min(films.length, count); i++) {
-    render(filmsContainerElement, createFilmTemplate(films[i]));
+    renderFilm(films[i]);
   }
 };
 
-renderSeveralFilms(DEFAULT_FILMS_COUNT, defaultFilmsElement, films);
+renderSeveralFilms(DEFAULT_FILMS_COUNT, defaultFilmsComponent.getElement(), films);
 
 if (films.length > DEFAULT_FILMS_COUNT) {
   let renderedFilmsCount = DEFAULT_FILMS_COUNT;
 
-  render(defaultFilmsElement, createShowMoreTemplate());
+  const ShowMoreComponent = new ShowMoreView();
 
-  const showMoreElement = defaultFilmsElement.querySelector('.films-list__show-more');
+  render(defaultFilmsComponent.getElement(), ShowMoreComponent.getElement());
 
-  showMoreElement.addEventListener('click', (evt) => {
+  ShowMoreComponent.getElement().addEventListener('click', (evt) => {
     evt.preventDefault();
 
-    renderSeveralFilms(DEFAULT_FILMS_COUNT, defaultFilmsElement, films.slice(renderedFilmsCount, renderedFilmsCount + DEFAULT_FILMS_COUNT));
+    renderSeveralFilms(DEFAULT_FILMS_COUNT, defaultFilmsComponent.getElement(), films.slice(renderedFilmsCount, renderedFilmsCount + DEFAULT_FILMS_COUNT));
 
     renderedFilmsCount += DEFAULT_FILMS_COUNT;
 
     if (renderedFilmsCount >= films.length) {
-      showMoreElement.remove();
+      ShowMoreComponent.getElement().remove();
     }
   });
 }
 
 
-renderSeveralFilms(SPECIAL_FILMS_COUNT, ratedFilmsElement, films);
-renderSeveralFilms(SPECIAL_FILMS_COUNT, commentedFilmsElement, films);
+renderSeveralFilms(SPECIAL_FILMS_COUNT, ratedFilmsComponent.getElement(), films);
+renderSeveralFilms(SPECIAL_FILMS_COUNT, commentedFilmsComponent.getElement(), films);
 
-render(footerElement, createPopupTemplate(films[0], comments), 'afterend');
+// render(footerElement, new PopupView(films[0], comments).getElement(), 'afterend');
 
-render(statisticsElement, createStatisticsTemplate(films.length), 'afterend');
+render(statisticsElement, new StatisticsView(films.length).getElement(), 'afterend');
