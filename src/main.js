@@ -6,6 +6,7 @@ import FilmsContainerView from './view/films-container.js';
 import DefaultFilmsView from './view/default-films.js';
 import RatedFilmsView from './view/rated-films';
 import CommentedFilmsView from './view/commented-films.js';
+import NoFilmView from './view/no-film.js';
 import FilmsView from './view/films.js';
 import ShowMoreView from './view/show-more.js';
 import PopupView from './view/popup.js';
@@ -41,9 +42,13 @@ const defaultFilmsComponent = new DefaultFilmsView();
 const ratedFilmsComponent = new RatedFilmsView();
 const commentedFilmsComponent = new CommentedFilmsView();
 
-render(filmsComponent.getElement(), defaultFilmsComponent.getElement());
-render(filmsComponent.getElement(), ratedFilmsComponent.getElement());
-render(filmsComponent.getElement(), commentedFilmsComponent.getElement());
+if (films.length === 0) {
+  render(filmsComponent.getElement(), new NoFilmView().getElement());
+} else {
+  render(filmsComponent.getElement(), defaultFilmsComponent.getElement());
+  render(filmsComponent.getElement(), ratedFilmsComponent.getElement());
+  render(filmsComponent.getElement(), commentedFilmsComponent.getElement());
+}
 
 const renderSeveralFilms = (count, container, films) => {
   const filmsContainerComponent = new FilmsContainerView();
@@ -63,12 +68,25 @@ const renderSeveralFilms = (count, container, films) => {
       document.body.classList.remove('hide-overflow');
     };
 
-    filmComponent.getElement().querySelector('.film-card__poster, .film-card__title, .film-card__comments').addEventListener('click', () => {
-      openPopup();
-    });
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        closePopup();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    filmComponent.getElement().querySelectorAll('.film-card__poster, .film-card__title, .film-card__comments')
+      .forEach((elem) => {
+        elem.addEventListener('click', () => {
+          openPopup();
+          document.addEventListener('keydown', onEscKeyDown);
+        });
+      });
 
     popupComponent.getElement().querySelector('.film-details__close-btn').addEventListener('click', () => {
       closePopup();
+      document.removeEventListener('keydown', onEscKeyDown);
     });
 
     render(filmsContainerComponent.getElement(), filmComponent.getElement());
