@@ -23,21 +23,3 @@ export const getRandomYear = () => {
 export const getRandomDate = () => {
   return dayjs().add(getRandomIntInclusive(-  15000, 0), 'day').format('DD MMMM YYYY');
 };
-
-export const render = (container, element, place = 'beforeend') => {
-  container.insertAdjacentElement(place, element);
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement('div');
-  newElement.innerHTML = template;
-
-  return newElement.children[0];
-};
-
-export const emotions = [
-  'smile',
-  'sleeping',
-  'puke',
-  'angry',
-];

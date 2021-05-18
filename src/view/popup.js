@@ -1,4 +1,5 @@
-import {emotions, createElement} from '../utils.js';
+import AbstractView from './abstract.js';
+import {emotions} from '../utils/consts.js';
 
 const getEmojisTemplate = (emotionsList) => {
   return emotionsList.map((emotion) => {
@@ -153,26 +154,26 @@ const createPopupTemplate = (film, comments) => {
   `);
 };
 
-export default class Popup {
+export default class Popup extends AbstractView {
   constructor(film, comments) {
-    this._element = null;
+    super();
     this._film = film;
     this._comments = comments;
+
+    this._closeClickHandler = this._closeClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPopupTemplate(this._film, this._comments);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _closeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closeClickHandler);
   }
 }
