@@ -16,7 +16,7 @@ import {generateFilm} from './mock/film.js';
 import {generateFilters} from './mock/filter.js';
 import {generateComments} from './mock/comment.js';
 
-import {render, remove} from './utils/render.js';
+import {render, remove, RenderPosition} from './utils/render.js';
 
 const FILMS_COUNT = 20;
 const DEFAULT_FILMS_COUNT = 5;
@@ -56,7 +56,7 @@ const renderSeveralFilms = (count, container, films) => {
     const popupComponent = new PopupView(film, comments);
 
     const openPopup = () => {
-      render(footerElement, popupComponent, 'afterend');
+      render(document.body, popupComponent);
       document.body.classList.add('hide-overflow');
 
       popupComponent.setCloseClickHandler(() => {
@@ -121,4 +121,4 @@ if (films.length > DEFAULT_FILMS_COUNT) {
 renderFilmsWithContainer(SPECIAL_FILMS_COUNT, ratedFilmsComponent, films);
 renderFilmsWithContainer(SPECIAL_FILMS_COUNT, commentedFilmsComponent, films);
 
-render(statisticsElement, new StatisticsView(films.length), 'afterend');
+render(statisticsElement, new StatisticsView(films.length), RenderPosition.AFTEREND);
