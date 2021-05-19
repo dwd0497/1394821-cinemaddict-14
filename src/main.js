@@ -16,7 +16,7 @@ import {generateFilm} from './mock/film.js';
 import {generateFilters} from './mock/filter.js';
 import {generateComments} from './mock/comment.js';
 
-import {render, remove, removeChild} from './utils/render.js';
+import {render, remove} from './utils/render.js';
 
 const FILMS_COUNT = 20;
 const DEFAULT_FILMS_COUNT = 5;

@@ -27,12 +27,3 @@ export const remove = (component) => {
   component.getElement().remove();
   component.removeElement();
 };
-
-export const removeChild = (container, component) => {
-  if (!(component instanceof Abstract)) {
-    throw new Error('Can remove only components');
-  }
-
-  container.removeChild(component.getElement());
-  component.removeElement();
-};
