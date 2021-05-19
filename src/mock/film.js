@@ -1,4 +1,4 @@
-import {getRandomIntInclusive, getRandomArrayValue, getRandomLengthArray, getRandomYear, getRandomDate} from '../utils.js';
+import {getRandomIntInclusive, getRandomArrayValue, getRandomLengthArray, getRandomYear, getRandomDate} from '../utils/common.js';
 
 const titles = [
   'Made for each other',

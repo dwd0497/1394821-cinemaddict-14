@@ -1,4 +1,5 @@
-import {getRandomDate, getRandomArrayValue, emotions} from '../utils.js';
+import {getRandomDate, getRandomArrayValue} from '../utils/common.js';
+import {emotions} from '../utils/consts.js';
 
 const NUMBER_OF_COMMENTS = 5;
 
