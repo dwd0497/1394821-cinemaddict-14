@@ -56,12 +56,17 @@ const renderSeveralFilms = (count, container, films) => {
     const popupComponent = new PopupView(film, comments);
 
     const openPopup = () => {
-      footerElement.appendChild(popupComponent.getElement());
+      render(footerElement, popupComponent, 'afterend');
       document.body.classList.add('hide-overflow');
+
+      popupComponent.setCloseClickHandler(() => {
+        closePopup();
+        document.removeEventListener('keydown', onEscKeydown);
+      });
     };
 
     const closePopup = () => {
-      removeChild(footerElement, popupComponent);
+      remove(popupComponent);
       document.body.classList.remove('hide-overflow');
     };
 
@@ -76,11 +81,6 @@ const renderSeveralFilms = (count, container, films) => {
     filmComponent.setFilmClickHandler(() => {
       openPopup();
       document.addEventListener('keydown', onEscKeydown);
-    });
-
-    popupComponent.setCloseClickHandler(() => {
-      closePopup();
-      document.removeEventListener('keydown', onEscKeydown);
     });
 
     render(container, filmComponent);
