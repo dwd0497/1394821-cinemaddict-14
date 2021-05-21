@@ -23,3 +23,18 @@ export const getRandomYear = () => {
 export const getRandomDate = () => {
   return dayjs().add(getRandomIntInclusive(-  15000, 0), 'day').format('DD MMMM YYYY');
 };
+
+export const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
+
