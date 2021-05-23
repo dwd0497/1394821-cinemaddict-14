@@ -7,6 +7,7 @@ export default class Film {
   constructor(filmContainer, changeData, handleDestroyPopup) {
     this._isPopupOpen = false;
     this._filmContainer = filmContainer;
+
     this._changeData = changeData;
     this._handleDestroyPopup = handleDestroyPopup;
 
@@ -24,6 +25,7 @@ export default class Film {
   init(film, comments) {
     this._film = film;
     this._comments = comments;
+
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
