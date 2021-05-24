@@ -26,22 +26,17 @@ export default class Film {
     this._film = film;
     this._comments = comments;
 
-
     const prevFilmComponent = this._filmComponent;
-    const prevPopupComponent = this._popupComponent;
+    // const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(this._film);
-    this._popupComponent = new PopupView(this._film, this._comments);
 
     this._filmComponent.setFilmClickHandler(this._handleFilmClick);
     this._filmComponent.setFilmFavoriteHandler(this._handleFavoriteClick);
     this._filmComponent.setFilmWatchedHandler(this._handleWatchedClick);
     this._filmComponent.setFilmWatchlistHandler(this._handleWatchlistClick);
-    this._popupComponent.setFilmFavoriteHandler(this._handleFavoriteClick);
-    this._popupComponent.setFilmWatchedHandler(this._handleWatchedClick);
-    this._popupComponent.setFilmWatchlistHandler(this._handleWatchlistClick);
 
-    if (prevFilmComponent === null || prevFilmComponent === null) {
+    if (prevFilmComponent === null) {
       render(this._filmContainer, this._filmComponent);
       return;
     }
@@ -50,12 +45,7 @@ export default class Film {
       replace(this._filmComponent, prevFilmComponent);
     }
 
-    if (document.body.contains(prevPopupComponent.getElement())) {
-      replace(this._popupComponent, prevPopupComponent);
-    }
-
     remove(prevFilmComponent);
-    remove(prevPopupComponent);
   }
 
   destroy() {
@@ -71,15 +61,28 @@ export default class Film {
 
   _openPopup() {
     this._handleDestroyPopup();
-    this._isPopupOpen = true;
-    render(document.body, this._popupComponent);
-    document.body.classList.add('hide-overflow');
+
+    const prevPopupComponent = this._popupComponent;
+    this._popupComponent = new PopupView(this._film, this._comments);
+
+    this._popupComponent.setFilmFavoriteHandler(this._handleFavoriteClick);
+    this._popupComponent.setFilmWatchedHandler(this._handleWatchedClick);
+    this._popupComponent.setFilmWatchlistHandler(this._handleWatchlistClick);
     this._popupComponent.setCloseClickHandler(this._handleCloseClick);
+
+    this._isPopupOpen = true;
+    if (prevPopupComponent === null) {
+      render(document.body, this._popupComponent);
+    }
+    document.body.classList.add('hide-overflow');
   }
 
   _closePopup() {
     this.isPopupOpen = false;
-    remove(this._popupComponent);
+    if (this._popupComponent) {
+      remove(this._popupComponent);
+    }
+    this._popupComponent = null;
     document.body.classList.remove('hide-overflow');
   }
 
