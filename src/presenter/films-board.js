@@ -50,6 +50,7 @@ export default class FilmsBoard {
       presenter.destroy();
     });
     this._filmPresenter = {};
+    this._renderedFilmsCount = DEFAULT_FILMS_COUNT;
     remove(this._showMoreComponent);
   }
 
@@ -101,6 +102,8 @@ export default class FilmsBoard {
     this._sortFilms(sortType);
 
     this._clearFilmList();
+
+    console.log(this._renderedFilmsCount);
 
     for (let i = 0; i < this._renderedFilmsCount; i++) {
       this._renderFilm(this._films[i], this._defaultFilmsContainer);
@@ -185,9 +188,7 @@ export default class FilmsBoard {
   }
 
   _renderShowMore() {
-    if (this._renderedFilmsCount === undefined) {
-      this._renderedFilmsCount = FILM_COUNT_PER_STEP;
-    }
+    this._renderedFilmsCount = FILM_COUNT_PER_STEP;
 
     if (this._films.length > FILM_COUNT_PER_STEP) {
       this._showMoreComponent = new ShowMoreView();
