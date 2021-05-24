@@ -103,8 +103,6 @@ export default class FilmsBoard {
 
     this._clearFilmList();
 
-    console.log(this._renderedFilmsCount);
-
     for (let i = 0; i < this._renderedFilmsCount; i++) {
       this._renderFilm(this._films[i], this._defaultFilmsContainer);
     }
