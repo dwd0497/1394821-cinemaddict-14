@@ -38,3 +38,10 @@ export const updateItem = (items, update) => {
   ];
 };
 
+export const sortByRating = (filmA, filmB) => {
+  return filmB.rating - filmA.rating;
+};
+
+export const sortByDate = (filmA, filmB) => {
+  return dayjs(filmB.releaseDate).diff(dayjs(filmA.releaseDate));
+};
