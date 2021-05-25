@@ -9,7 +9,7 @@ import NoFilmView from '../view/no-film.js';
 import FilmsView from '../view/films.js';
 import ShowMoreView from '../view/show-more.js';
 
-import {render, remove} from '../utils/render.js';
+import {render, remove, RenderPosition} from '../utils/render.js';
 import {updateItem, sortByRating, sortByDate} from '../utils/common.js';
 import {SortType} from '../utils/consts.js';
 
@@ -26,7 +26,6 @@ export default class FilmsBoard {
     this._currentSortType = SortType.DEFAULT;
 
     this._filmsBoardComponent = new FilmsView();
-    this._sortComponent = new SortView();
     this._noFilmComponent = new NoFilmView();
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleDestroyPopup = this._handleDestroyPopup.bind(this);
@@ -41,8 +40,8 @@ export default class FilmsBoard {
     this._commentedFilms = films.slice(0, SPECIAL_FILMS_COUNT);
     this._comments = comments;
 
-    this._renderSort();
     this._renderFilmsBoard(this._films);
+    this._renderSort();
   }
 
   _clearFilmList() {
@@ -107,11 +106,17 @@ export default class FilmsBoard {
       this._renderFilm(this._films[i], this._defaultFilmsContainer);
     }
 
+    this._renderSort();
+
     this._renderShowMore();
   }
 
   _renderSort() {
-    render(this._filmsBoardContainer, this._sortComponent);
+    if (this._sortComponent) {
+      remove(this._sortComponent);
+    }
+    this._sortComponent = new SortView(this._currentSortType);
+    render(this._filmsBoardComponent, this._sortComponent, RenderPosition.BEFOREBEGIN);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 

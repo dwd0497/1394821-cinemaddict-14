@@ -27,7 +27,6 @@ export default class Film {
     this._comments = comments;
 
     const prevFilmComponent = this._filmComponent;
-    // const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(this._film);
 
