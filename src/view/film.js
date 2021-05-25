@@ -39,6 +39,9 @@ export default class Film extends AbstractView {
     this._film = film;
 
     this._filmClickHandler = this._filmClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._watchedClickHandler = this._watchedClickHandler.bind(this);
+    this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -50,10 +53,40 @@ export default class Film extends AbstractView {
     this._callback.filmClick();
   }
 
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _watchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  }
+
+  _watchlistClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  }
+
   setFilmClickHandler(callback) {
     this._callback.filmClick = callback;
     this.getElement().querySelectorAll('.film-card__poster, .film-card__title, .film-card__comments').forEach((elem) => {
       elem.addEventListener('click', this._filmClickHandler);
     });
+  }
+
+  setFilmFavoriteHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._favoriteClickHandler);
+  }
+
+  setFilmWatchedHandler(callback) {
+    this._callback.watchedClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._watchedClickHandler);
+  }
+
+  setFilmWatchlistHandler(callback) {
+    this._callback.watchlistClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this._watchlistClickHandler);
   }
 }

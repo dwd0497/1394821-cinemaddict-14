@@ -4,3 +4,9 @@ export const emotions = [
   'puke',
   'angry',
 ];
+
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};

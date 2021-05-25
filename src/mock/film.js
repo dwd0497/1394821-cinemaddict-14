@@ -1,4 +1,5 @@
 import {getRandomIntInclusive, getRandomArrayValue, getRandomLengthArray, getRandomYear, getRandomDate} from '../utils/common.js';
+import {nanoid} from 'nanoid';
 
 const titles = [
   'Made for each other',
@@ -81,6 +82,7 @@ const description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cr
 
 export const generateFilm = () => {
   return {
+    id: nanoid(),
     title: getRandomArrayValue(titles),
     originalTtitle: getRandomArrayValue(titles),
     poster: getRandomArrayValue(postersSrc),
