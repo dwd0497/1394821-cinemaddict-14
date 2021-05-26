@@ -1,5 +1,6 @@
 import SmartView from './smart.js';
 import {emotions} from '../utils/consts.js';
+import {convertMinutesToHours, formatDate, formatDateAndTime} from '../utils/common.js';
 
 const getEmojisTemplate = (emotionsList) => {
   return emotionsList.map((emotion) => {
@@ -39,7 +40,7 @@ const getCommentsTemplate = (comments) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${date}</span>
+        <span class="film-details__comment-day">${formatDateAndTime(date)}</span>
         <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -96,11 +97,11 @@ const createPopupTemplate = (data, comments) => {
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Release Date</td>
-                        <td class="film-details__cell">${releaseDate}</td>
+                        <td class="film-details__cell">${formatDate(releaseDate)}</td>
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Runtime</td>
-                        <td class="film-details__cell">${duration}</td>
+                        <td class="film-details__cell">${convertMinutesToHours(duration)}</td>
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Country</td>

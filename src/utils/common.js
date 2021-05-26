@@ -17,11 +17,23 @@ export const getRandomLengthArray = (array) => {
 };
 
 export const getRandomYear = () => {
-  return dayjs().add(getRandomIntInclusive(-50, 0), 'year').format('YYYY');
+  return dayjs().add(getRandomIntInclusive(-50, 0), 'year');
 };
 
 export const getRandomDate = () => {
-  return dayjs().add(getRandomIntInclusive(-  15000, 0), 'day').format('DD MMMM YYYY');
+  return dayjs().add(getRandomIntInclusive(-  15000, 0), 'day');
+};
+
+export const formatYear = (date) => {
+  return dayjs(date).format('YYYY');
+};
+
+export const formatDate = (date) => {
+  return dayjs(date).format('DD MMMM YYYY');
+};
+
+export const formatDateAndTime = (date) => {
+  return dayjs(date).format('YYYY/MM/DD HH:mm');
 };
 
 export const updateItem = (items, update) => {
@@ -44,4 +56,11 @@ export const sortByRating = (filmA, filmB) => {
 
 export const sortByDate = (filmA, filmB) => {
   return dayjs(filmB.releaseDate).diff(dayjs(filmA.releaseDate));
+};
+
+export const convertMinutesToHours = (min) => {
+  const hours = Math.floor(min / 60);
+  const minutes = Math.floor(min % 60);
+
+  return hours > 0 ? hours + 'h ' + minutes + 'm' : minutes + 'm';
 };
