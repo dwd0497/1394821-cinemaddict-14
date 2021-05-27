@@ -1,5 +1,6 @@
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 import {emotions} from '../utils/consts.js';
+import {convertMinutesToHours, formatDate, formatDateAndTime} from '../utils/common.js';
 
 const getEmojisTemplate = (emotionsList) => {
   return emotionsList.map((emotion) => {
@@ -39,7 +40,7 @@ const getCommentsTemplate = (comments) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${date}</span>
+        <span class="film-details__comment-day">${formatDateAndTime(date)}</span>
         <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -48,8 +49,8 @@ const getCommentsTemplate = (comments) => {
   }).join('');
 };
 
-const createPopupTemplate = (film, comments) => {
-  const {title, originalTtitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist} = film;
+const createPopupTemplate = (data, comments) => {
+  const {title, originalTtitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment} = data;
 
   const addCheckAttribute = (flag) => {
     return flag ? 'checked' : '';
@@ -96,11 +97,11 @@ const createPopupTemplate = (film, comments) => {
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Release Date</td>
-                        <td class="film-details__cell">${releaseDate}</td>
+                        <td class="film-details__cell">${formatDate(releaseDate)}</td>
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Runtime</td>
-                        <td class="film-details__cell">${duration}</td>
+                        <td class="film-details__cell">${convertMinutesToHours(duration)}</td>
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Country</td>
@@ -137,12 +138,12 @@ const createPopupTemplate = (film, comments) => {
                 </ul>
 
                 <div class="film-details__new-comment">
-                    <div class="film-details__add-emoji-label"></div>
-
+                    <div class="film-details__add-emoji-label">
+                      ${selectedEmotion ? '<img src="images/emoji/' + selectedEmotion + '.png" width="55" height="55" alt="emoji-' + selectedEmotion + '"></img>' : ''}
+                    </div>
                     <label class="film-details__comment-label">
-                    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
                     </label>
-
                     <div class="film-details__emoji-list">
                       ${getEmojisTemplate(emotions)}
                     </div>
@@ -154,20 +155,42 @@ const createPopupTemplate = (film, comments) => {
   `);
 };
 
-export default class Popup extends AbstractView {
+export default class Popup extends SmartView {
   constructor(film, comments) {
     super();
-    this._film = film;
+    this._data = Popup.parseDataToState(film);
     this._comments = comments;
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
     this._watchedChangeHandler = this._watchedChangeHandler.bind(this);
     this._watchlistChangeHandler = this._watchlistChangeHandler.bind(this);
+
+    this._emotionChangeHandler = this._emotionChangeHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+
+    this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emotionChangeHandler);
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
   }
 
   getTemplate() {
-    return createPopupTemplate(this._film, this._comments);
+    return createPopupTemplate(this._data, this._comments);
+  }
+
+  _emotionChangeHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName !== 'LABEL') {
+      const currentOffset = this.getElement().scrollTop;
+      this.updateData({selectedEmotion: evt.target.value});
+      this.getElement().scrollBy(0, currentOffset);
+    }
+  }
+
+  _commentInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      comment: evt.target.value,
+    }, true);
   }
 
   _closeClickHandler(evt) {
@@ -208,5 +231,32 @@ export default class Popup extends AbstractView {
   setFilmWatchlistHandler(callback) {
     this._callback.watchlistChange = callback;
     this.getElement().querySelector('#watchlist').addEventListener('change', this._watchlistChangeHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseClickHandler(this._callback.closeClick);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emotionChangeHandler);
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
+  }
+
+  reset(film) {
+    this.updateData(Popup.parseStateToData(film));
+  }
+
+  static parseDataToState(data) {
+    return Object.assign({}, data, {selectedEmotion: null, comment: ''});
+  }
+
+  static parseStateToData(state) {
+    const data = Object.assign({}, state);
+
+    delete data.selectedEmotion;
+    delete data.comment;
+
+    return data;
   }
 }

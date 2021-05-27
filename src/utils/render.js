@@ -2,6 +2,7 @@ import Abstract from '../view/abstract.js';
 
 export const RenderPosition = {
   AFTEREND: 'afterend',
+  BEFOREBEGIN: 'beforebegin',
   BEFOREEND: 'beforeend',
 };
 

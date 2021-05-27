@@ -27,7 +27,6 @@ export default class Film {
     this._comments = comments;
 
     const prevFilmComponent = this._filmComponent;
-    // const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(this._film);
 
@@ -86,6 +85,7 @@ export default class Film {
   }
 
   _handleCloseClick() {
+    this._popupComponent.reset(this._film);
     this._closePopup();
     document.removeEventListener('keydown', this._escKeydownHandler);
   }
@@ -98,6 +98,7 @@ export default class Film {
   _escKeydownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this._popupComponent.reset(this._film);
       this._closePopup();
       document.removeEventListener('keydown', this._escKeydownHandler);
     }

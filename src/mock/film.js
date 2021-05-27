@@ -95,7 +95,7 @@ export const generateFilm = () => {
     producer: getRandomArrayValue(producers),
     screenwriters: getRandomLengthArray(screenwriters),
     cast: getRandomLengthArray(actors),
-    duration: `${getRandomIntInclusive(0, 8)}h ${getRandomIntInclusive(0, 59)}m`,
+    duration: `${getRandomIntInclusive(30, 120)}`,
     genres: getRandomLengthArray(genres),
     shortDescription: getRandomLengthArray(description).join('. '),
     description: getRandomLengthArray(description).join('. '),
