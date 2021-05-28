@@ -14,9 +14,9 @@ import {generateComments} from './mock/comment.js';
 import {render, RenderPosition} from './utils/render.js';
 
 const FILMS_COUNT = 20;
-
-const films = new Array(FILMS_COUNT).fill().map(generateFilm);
 const comments = generateComments();
+
+const films = new Array(FILMS_COUNT).fill().map(() => generateFilm(comments));
 
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(films);

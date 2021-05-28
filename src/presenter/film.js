@@ -82,7 +82,9 @@ export default class Film {
   }
 
   _getComments() {
-    return this._commentsModel.getComments();
+    return this._commentsModel.getComments().filter((comment) => {
+      return this._film.comments.indexOf(comment.id) != -1;
+    });
   }
 
   _closePopup() {
@@ -117,7 +119,7 @@ export default class Film {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}),
     );
   }
@@ -125,7 +127,7 @@ export default class Film {
   _handleWatchedClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       Object.assign({}, this._film, {isWatched: !this._film.isWatched}),
     );
   }
@@ -133,7 +135,7 @@ export default class Film {
   _handleWatchlistClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       Object.assign({}, this._film, {isInWatchlist: !this._film.isInWatchlist}),
     );
   }

@@ -44,3 +44,9 @@ export const generateComments = () => {
   }
   return commentsList;
 };
+
+export const getCommentsIds = (comments) => {
+  const ids = [];
+  comments.forEach((comment) => ids.push(comment.id));
+  return ids;
+};

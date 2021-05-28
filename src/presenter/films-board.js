@@ -33,7 +33,6 @@ export default class FilmsBoard {
 
     this._filmsBoardComponent = new FilmsView();
     this._noFilmComponent = new NoFilmView();
-    this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleDestroyPopup = this._handleDestroyPopup.bind(this);
     this._handleShowMoreClick = this._handleShowMoreClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -76,18 +75,6 @@ export default class FilmsBoard {
     remove(this._showMoreComponent);
   }
 
-  _handleFilmChange(updatedFilm) {
-    if (updatedFilm.id in this._filmPresenter) {
-      this._filmPresenter[updatedFilm.id].init(updatedFilm, this._commentsModel);
-    }
-    if (updatedFilm.id in this._filmPresenterRated) {
-      this._filmPresenterRated[updatedFilm.id].init(updatedFilm, this._commentsModel);
-    }
-    if (updatedFilm.id in this._filmPresenterCommented) {
-      this._filmPresenterCommented[updatedFilm.id].init(updatedFilm, this._commentsModel);
-    }
-  }
-
   _handleDestroyPopup() {
     Object.values(this._filmPresenter).forEach((presenter) => {
       presenter.destroyPopup();
@@ -117,7 +104,15 @@ export default class FilmsBoard {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmPresenter[data.id].init(data, this._commentsModel);
+        if (this._filmPresenter[data.id]) {
+          this._filmPresenter[data.id].init(data, this._commentsModel);
+        }
+        if (this._filmPresenterRated[data.id]) {
+          this._filmPresenterRated[data.id].init(data, this._commentsModel);
+        }
+        if (this._filmPresenterCommented[data.id]) {
+          this._filmPresenterCommented[data.id].init(data, this._commentsModel);
+        }
         break;
       case UpdateType.MINOR:
         this._clearFilmsBoard();
@@ -158,14 +153,14 @@ export default class FilmsBoard {
   }
 
   _renderRatedFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleFilmChange, this._handleDestroyPopup);
-    filmPresenter.init(film, this._comments);
+    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup);
+    filmPresenter.init(film, this._commentsModel);
     this._filmPresenterRated[film.id] = filmPresenter;
   }
 
   _renderCommentedFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleFilmChange, this._handleDestroyPopup);
-    filmPresenter.init(film, this._comments);
+    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup);
+    filmPresenter.init(film, this._commentsModel);
     this._filmPresenterCommented[film.id] = filmPresenter;
   }
 
