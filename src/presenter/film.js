@@ -1,5 +1,6 @@
 import FilmView from '../view/film.js';
 import PopupView from '../view/popup.js';
+import {UserAction, UpdateType} from '../utils/consts.js';
 
 import {render, remove, replace} from '../utils/render.js';
 
@@ -20,11 +21,13 @@ export default class Film {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(film, comments) {
+  init(film, commentsModel) {
     this._film = film;
-    this._comments = comments;
+    this._commentsModel = commentsModel;
 
     const prevFilmComponent = this._filmComponent;
 
@@ -61,7 +64,10 @@ export default class Film {
     this._handleDestroyPopup();
 
     const prevPopupComponent = this._popupComponent;
-    this._popupComponent = new PopupView(this._film, this._comments);
+    this._popupComponent = new PopupView(this._film, this._getComments());
+    this._popupComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._popupComponent.setInputHandler(this._handleTextAreaInput);
+    this._popupComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     this._popupComponent.setFilmFavoriteHandler(this._handleFavoriteClick);
     this._popupComponent.setFilmWatchedHandler(this._handleWatchedClick);
@@ -73,6 +79,10 @@ export default class Film {
       render(document.body, this._popupComponent);
     }
     document.body.classList.add('hide-overflow');
+  }
+
+  _getComments() {
+    return this._commentsModel.getComments();
   }
 
   _closePopup() {
@@ -105,19 +115,61 @@ export default class Film {
   }
 
   _handleFavoriteClick() {
-    const newFilmData = Object.assign({}, this._film, {isFavorite: !this._film.isFavorite});
-    this._changeData(newFilmData);
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MAJOR,
+      Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}),
+    );
   }
 
   _handleWatchedClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MAJOR,
       Object.assign({}, this._film, {isWatched: !this._film.isWatched}),
     );
   }
 
   _handleWatchlistClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MAJOR,
       Object.assign({}, this._film, {isInWatchlist: !this._film.isInWatchlist}),
     );
+  }
+
+  _handleFormSubmit(comment, commentsIds) {
+    this._changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.MINOR,
+      comment,
+    );
+    this._changeData(
+      UserAction.UPDATE,
+      UpdateType.MINOR,
+      {...this._film, commentsIds: commentsIds},
+    );
+    this.destroyPopup();
+    this._openPopup();
+  }
+
+  _handleDeleteClick(deletedCommentId, deletedComment) {
+    const updatedCommentsIds = this._film.comments.filter((commentId) => commentId !== parseInt(deletedCommentId));
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this._film, comments: updatedCommentsIds},
+    );
+    this._changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.MINOR,
+      deletedComment,
+    );
+    this.destroyPopup();
+    this._openPopup();
+  }
+
+  _handleTextAreaInput(evt) {
+    this._popupComponent().querySelector('.film-details__comment-input').innerHTML = evt.target.value;
   }
 }
