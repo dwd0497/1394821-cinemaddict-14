@@ -1,11 +1,13 @@
 import FilmView from '../view/film.js';
 import PopupView from '../view/popup.js';
+
 import {UserAction, UpdateType} from '../utils/consts.js';
 
 import {render, remove, replace} from '../utils/render.js';
 
 export default class Film {
-  constructor(filmContainer, changeData, handleDestroyPopup) {
+  constructor(filmContainer, changeData, handleDestroyPopup, api) {
+    this._api = api;
     this._isPopupOpen = false;
     this._filmContainer = filmContainer;
 
@@ -64,26 +66,24 @@ export default class Film {
     this._handleDestroyPopup();
 
     const prevPopupComponent = this._popupComponent;
-    this._popupComponent = new PopupView(this._film, this._getComments());
-    this._popupComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._popupComponent.setInputHandler(this._handleTextAreaInput);
-    this._popupComponent.setDeleteClickHandler(this._handleDeleteClick);
 
-    this._popupComponent.setFilmFavoriteHandler(this._handleFavoriteClick);
-    this._popupComponent.setFilmWatchedHandler(this._handleWatchedClick);
-    this._popupComponent.setFilmWatchlistHandler(this._handleWatchlistClick);
-    this._popupComponent.setCloseClickHandler(this._handleCloseClick);
+    this._api.getComments(this._film.id).then((comments) => {
+      this._commentsModel.setComments(comments);
+      this._popupComponent = new PopupView(this._film, comments);
+      this._popupComponent.setFormSubmitHandler(this._handleFormSubmit);
+      this._popupComponent.setInputHandler(this._handleTextAreaInput);
+      this._popupComponent.setDeleteClickHandler(this._handleDeleteClick);
 
-    this._isPopupOpen = true;
-    if (prevPopupComponent === null) {
-      render(document.body, this._popupComponent);
-    }
-    document.body.classList.add('hide-overflow');
-  }
+      this._popupComponent.setFilmFavoriteHandler(this._handleFavoriteClick);
+      this._popupComponent.setFilmWatchedHandler(this._handleWatchedClick);
+      this._popupComponent.setFilmWatchlistHandler(this._handleWatchlistClick);
+      this._popupComponent.setCloseClickHandler(this._handleCloseClick);
 
-  _getComments() {
-    return this._commentsModel.getComments().filter((comment) => {
-      return this._film.comments.indexOf(comment.id) != -1;
+      this._isPopupOpen = true;
+      if (prevPopupComponent === null) {
+        render(document.body, this._popupComponent);
+      }
+      document.body.classList.add('hide-overflow');
     });
   }
 

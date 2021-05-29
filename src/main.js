@@ -9,21 +9,20 @@ import UserView from './view/user.js';
 import StatisticsView from './view/statistics.js';
 import StatView from './view/stat.js';
 
-import {generateFilm} from './mock/film.js';
-import {generateComments} from './mock/comment.js';
+import {render, RenderPosition, replace} from './utils/render.js';
+import {UpdateType} from './utils/consts.js';
 
-import {render, RenderPosition} from './utils/render.js';
+import Api from './api.js';
 
-const FILMS_COUNT = 20;
-const comments = generateComments();
+const AUTHORIZATION = 'Basic fdkoasngoinmo32mf';
+const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
-const films = new Array(FILMS_COUNT).fill().map(() => generateFilm(comments));
+const api = new Api(END_POINT, AUTHORIZATION);
+
 
 const filmsModel = new FilmsModel();
-filmsModel.setFilms(films);
 
 const commentsModel = new CommentsModel();
-commentsModel.setComments(comments);
 
 const filterModel = new FilterModel();
 
@@ -34,11 +33,22 @@ const statisticsElement = footerElement.querySelector('.footer__statistics');
 
 render(headerElement, new UserView());
 
-const filmsBoardPresenter = new FilmsBoardPresenter(mainElement, filmsModel, filterModel);
+const filmsBoardPresenter = new FilmsBoardPresenter(mainElement, filmsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(mainElement, filterModel, filmsModel, filmsBoardPresenter, commentsModel);
-const statComponent = new StatView(films);
+const statComponent = new StatView();
 filterPresenter.init(statComponent);
 filmsBoardPresenter.init(commentsModel);
 render(mainElement, statComponent);
 
-render(statisticsElement, new StatisticsView(films.length), RenderPosition.AFTEREND);
+const statisticsComponent = new StatisticsView();
+render(statisticsElement, statisticsComponent, RenderPosition.AFTEREND);
+
+api.getFilms()
+  .then((films) => {
+    filmsModel.setFilms(UpdateType.INIT, films);
+    replace(new StatisticsView(films.length), statisticsComponent);
+    replace(new StatView(films), statComponent);
+  })
+  .catch(() => {
+    filmsModel.setFilms(UpdateType.INIT, []);
+  });

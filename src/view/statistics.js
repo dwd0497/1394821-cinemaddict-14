@@ -7,7 +7,7 @@ const createStatisticsTemplate = (filmsCount) => {
 };
 
 export default class Statistics extends AbstractView {
-  constructor(filmsCount) {
+  constructor(filmsCount = 0) {
     super();
     this._filmsCount = filmsCount;
   }

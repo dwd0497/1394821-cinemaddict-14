@@ -30,7 +30,7 @@ export default class Filter {
     this._filterComponent.setFilterTypeClickHandler(this._handleFilterTypeClick);
 
     if (prevFilterComponent === null) {
-      render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
+      render(this._filterContainer, this._filterComponent, RenderPosition.AFTERBEGIN);
       return;
     }
     replace(this._filterComponent, prevFilterComponent);
@@ -42,11 +42,13 @@ export default class Filter {
   }
 
   _handleFilterTypeClick(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
-      return;
-    }
+    if (this._filmsModel.getFilms().length) {
+      if (this._filterModel.getFilter() === filterType) {
+        return;
+      }
 
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+      this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+    }
   }
 
   _getFilters() {
@@ -77,17 +79,19 @@ export default class Filter {
   }
 
   _handlePageTypeClick(pageItemType) {
-    switch (pageItemType) {
-      case PageType.FILMS:
-        this._filterComponent.setPageType();
-        this._boardPresenter.destroy();
-        this._statComponent.show();
-        break;
-      case PageType.STATS:
-        this._filterComponent.setPageType();
-        this._boardPresenter.init(this._commentsModel);
-        this._statComponent.hide();
-        break;
+    if (this._filmsModel.getFilms().length) {
+      switch (pageItemType) {
+        case PageType.FILMS:
+          this._filterComponent.setPageType();
+          this._boardPresenter.destroy();
+          this._statComponent.show();
+          break;
+        case PageType.STATS:
+          this._filterComponent.setPageType();
+          this._boardPresenter.init(this._commentsModel);
+          this._statComponent.hide();
+          break;
+      }
     }
   }
 }

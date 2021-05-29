@@ -9,7 +9,7 @@ import {getRank} from '../utils/userRank.js';
 const renderChart = (statisticCtx, data) => {
   const {films, statPeriod} = data;
 
-  const watchedFilms = films.filter((film) => film.isAlreadyWatched);
+  const watchedFilms = films.filter((film) => film.isWatched);
   const watchedFilmsByPeriod = getFilmsByPeriod(watchedFilms, statPeriod);
   const genreCounts = getCountByGenre(watchedFilmsByPeriod);
   const genres = genreCounts.map((obj) => obj.genre);
@@ -76,7 +76,7 @@ const renderChart = (statisticCtx, data) => {
 const createStatTemplate = (data) => {
   const {films, statPeriod} = data;
 
-  const watchedFilms = films.filter((film) => film.isAlreadyWatched);
+  const watchedFilms = films.filter((film) => film.isWatched);
   const watchedFilmsByPeriod = getFilmsByPeriod(watchedFilms, statPeriod);
   const totalDuration = getTotaDuration(watchedFilmsByPeriod);
   const totalDurationHours = totalDuration < 60 ? totalDuration : parseInt(totalDuration / 60);
@@ -126,7 +126,7 @@ const createStatTemplate = (data) => {
 };
 
 export default class Stat extends SmartView {
-  constructor(films) {
+  constructor(films = []) {
     super();
 
     this._data = {

@@ -8,6 +8,7 @@ import CommentedFilmsView from '../view/commented-films.js';
 import NoFilmView from '../view/no-film.js';
 import FilmsView from '../view/films.js';
 import ShowMoreView from '../view/show-more.js';
+import LoadingView from '../view/loading.js';
 
 import {render, remove, RenderPosition} from '../utils/render.js';
 import {sortByRating, sortByDate} from '../utils/common.js';
@@ -19,7 +20,8 @@ const FILM_COUNT_PER_STEP = 5;
 const SPECIAL_FILMS_COUNT = 2;
 
 export default class FilmsBoard {
-  constructor(filmsBoardContainer, filmsModel, filterModel) {
+  constructor(filmsBoardContainer, filmsModel, filterModel, api) {
+    this._api = api;
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
     this._filmsBoardContainer = filmsBoardContainer;
@@ -27,10 +29,12 @@ export default class FilmsBoard {
     this._filmPresenterRated = {};
     this._filmPresenterCommented = {};
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
 
     this._sortComponent = null;
     this._showMoreComponent = null;
 
+    this._loadingComponent = new LoadingView();
     this._filmsBoardComponent = new FilmsView();
     this._noFilmComponent = new NoFilmView();
     this._handleDestroyPopup = this._handleDestroyPopup.bind(this);
@@ -100,7 +104,9 @@ export default class FilmsBoard {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response);
+        });
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(updateType, update);
@@ -132,6 +138,11 @@ export default class FilmsBoard {
         this._clearFilmsBoard({resetRenderedTasksCount: true, resetSortType: true});
         this._renderFilmsBoard();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderFilmsBoard();
+        break;
     }
   }
 
@@ -157,19 +168,19 @@ export default class FilmsBoard {
   }
 
   _renderFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup);
+    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup, this._api);
     filmPresenter.init(film, this._commentsModel);
     this._filmPresenter[film.id] = filmPresenter;
   }
 
   _renderRatedFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup);
+    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup, this._api);
     filmPresenter.init(film, this._commentsModel);
     this._filmPresenterRated[film.id] = filmPresenter;
   }
 
   _renderCommentedFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup);
+    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup, this._api);
     filmPresenter.init(film, this._commentsModel);
     this._filmPresenterCommented[film.id] = filmPresenter;
   }
@@ -245,6 +256,10 @@ export default class FilmsBoard {
     }
   }
 
+  _renderLoading() {
+    render(this._filmsBoardComponent, this._loadingComponent);
+  }
+
   _clearFilmsBoard({resetRenderedTasksCount = false, resetSortType = false} = {}) {
     const filmsCount = this._getFilms().length;
 
@@ -253,6 +268,7 @@ export default class FilmsBoard {
 
     remove(this._sortComponent);
     remove(this._noFilmComponent);
+    remove(this._loadingComponent);
     remove(this._showMoreComponent);
     remove(this._defaultFilmsComponent);
     remove(this._ratedFilmsComponent);
@@ -270,6 +286,10 @@ export default class FilmsBoard {
   }
 
   _renderFilmsBoard() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
     const films = this._getFilms();
     const filmCount = films.length;
 
