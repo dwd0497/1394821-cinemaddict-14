@@ -1,4 +1,5 @@
 import AbstractView from './abstract.js';
+import {PageType} from '../utils/consts.js';
 
 const createMenuItemTemplate = (filter, currentFilterType) => {
   const {type, name, count} = filter;
@@ -11,7 +12,7 @@ const createMenuItemTemplate = (filter, currentFilterType) => {
   `);
 };
 
-const createMenuTemplate = (filters, currentFilterType) => {
+const createMenuTemplate = (filters, currentFilterType, currentPage) => {
   const menuItemsTemplate = filters.map((filter) => createMenuItemTemplate(filter, currentFilterType)).join('');
 
   return (`
@@ -19,23 +20,25 @@ const createMenuTemplate = (filters, currentFilterType) => {
         <div class="main-navigation__items">
           ${menuItemsTemplate}
         </div>
-        <a href="#stats" class="main-navigation__additional">Stats</a>
+        <a href="#${currentPage.toLowerCase()}" class="main-navigation__additional" id="${currentPage}">${currentPage}</a>
     </nav>
   `);
 };
 
 export default class Menu extends AbstractView {
-  constructor(filters, currentFilterType) {
+  constructor(filters, currentFilterType, currentPageType = PageType.FILMS) {
     super();
+    this._currentPage = currentPageType;
 
     this._currentFilterType = currentFilterType;
     this._filters = filters;
 
     this._filterTypeClickHandler = this._filterTypeClickHandler.bind(this);
+    this._pageTypeClickHandler = this._pageTypeClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createMenuTemplate(this._filters, this._currentFilterType);
+    return createMenuTemplate(this._filters, this._currentFilterType, this._currentPage);
   }
 
   _filterTypeClickHandler(evt) {
@@ -45,6 +48,24 @@ export default class Menu extends AbstractView {
 
   setFilterTypeClickHandler(callback) {
     this._callback.filterTypeClick = callback;
-    this.getElement().querySelectorAll('a').forEach((element) => element.addEventListener('click', this._filterTypeClickHandler));
+    this.getElement().querySelectorAll('.main-navigation__item').forEach((element) => element.addEventListener('click', this._filterTypeClickHandler));
+  }
+
+  _pageTypeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.pageTypeClick(evt.target.id);
+  }
+
+  setPageTypeClickHandler(callback) {
+    this._callback.pageTypeClick = callback;
+    this.getElement().querySelector('.main-navigation__additional').addEventListener('click', this._pageTypeClickHandler);
+  }
+
+  setPageType() {
+    this._currentPage === PageType.FILMS ? this._currentPage = PageType.STATS : this._currentPage = PageType.FILMS;
+    const pageTypeElement = this.getElement().querySelector('.main-navigation__additional');
+    pageTypeElement.id = this._currentPage;
+    pageTypeElement.textContent = this._currentPage;
+    pageTypeElement.href = `#${this._currentPage.toLowerCase()}`;
   }
 }

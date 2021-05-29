@@ -38,17 +38,27 @@ export default class FilmsBoard {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-
-    this._filmsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init(commentsModel) {
     this._commentsModel = commentsModel;
     this._commentsModel.addObserver(this._handleModelEvent);
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
 
     render(this._filmsBoardContainer, this._filmsBoardComponent);
     this._renderFilmsBoard();
+  }
+
+  destroy() {
+    this._clearFilmsBoard({resetRenderedTasksCount: true, resetSortType: true});
+
+    remove(this._filmsBoardComponent);
+    remove(this._sortComponent);
+
+    this._commentsModel.addObserver(this._handleModelEvent);
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   _getFilms() {

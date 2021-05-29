@@ -7,6 +7,7 @@ import FilterModel from './model/filter.js';
 
 import UserView from './view/user.js';
 import StatisticsView from './view/statistics.js';
+import StatView from './view/stat.js';
 
 import {generateFilm} from './mock/film.js';
 import {generateComments} from './mock/comment.js';
@@ -34,8 +35,10 @@ const statisticsElement = footerElement.querySelector('.footer__statistics');
 render(headerElement, new UserView());
 
 const filmsBoardPresenter = new FilmsBoardPresenter(mainElement, filmsModel, filterModel);
-const filterPresenter = new FilterPresenter(mainElement, filterModel, filmsModel, filmsBoardPresenter);
-filterPresenter.init();
+const filterPresenter = new FilterPresenter(mainElement, filterModel, filmsModel, filmsBoardPresenter, commentsModel);
+const statComponent = new StatView(films);
+filterPresenter.init(statComponent);
 filmsBoardPresenter.init(commentsModel);
+render(mainElement, statComponent);
 
 render(statisticsElement, new StatisticsView(films.length), RenderPosition.AFTEREND);

@@ -2,9 +2,11 @@ import Menu from '../view/menu.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {filter} from '../utils/filter.js';
 import {FilterType, UpdateType} from '../utils/consts.js';
+import {PageType} from '../utils/consts.js';
 
 export default class Filter {
-  constructor(filterContainer, filterModel, filmsModel, boardPresenter) {
+  constructor(filterContainer, filterModel, filmsModel, boardPresenter, commentsModel) {
+    this._commentsModel = commentsModel;
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
@@ -13,15 +15,17 @@ export default class Filter {
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeClick = this._handleFilterTypeClick.bind(this);
+    this._handlePageTypeClick = this._handlePageTypeClick.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
-    const filters = this._getFilters();
+  init(statComponent) {
     const prevFilterComponent = this._filterComponent;
-    this._filterComponent = new Menu(filters, this._filterModel.getFilter());
+    this._statComponent = statComponent;
+    this._filterComponent = new Menu(this._getFilters(), this._filterModel.getFilter());
+    this._filterComponent.setPageTypeClickHandler(this._handlePageTypeClick);
 
     this._filterComponent.setFilterTypeClickHandler(this._handleFilterTypeClick);
 
@@ -70,5 +74,20 @@ export default class Filter {
         count: filter[FilterType.FAVORITES](films).length,
       },
     ];
+  }
+
+  _handlePageTypeClick(pageItemType) {
+    switch (pageItemType) {
+      case PageType.FILMS:
+        this._filterComponent.setPageType();
+        this._boardPresenter.destroy();
+        this._statComponent.show();
+        break;
+      case PageType.STATS:
+        this._filterComponent.setPageType();
+        this._boardPresenter.init(this._commentsModel);
+        this._statComponent.hide();
+        break;
+    }
   }
 }

@@ -29,3 +29,22 @@ export const FilterType = {
   HISTORY: 'History',
   FAVORITES: 'Favorites',
 };
+
+export const PageType = {
+  FILMS: 'Films',
+  STATS: 'Stats',
+};
+
+export const UserRank = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
+export const StatPeriod = {
+  ALL: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};

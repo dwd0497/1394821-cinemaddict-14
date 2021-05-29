@@ -21,7 +21,7 @@ export const getRandomYear = () => {
 };
 
 export const getRandomDate = () => {
-  return dayjs().add(getRandomIntInclusive(-  15000, 0), 'day');
+  return dayjs().add(getRandomIntInclusive(-50, 0), 'day');
 };
 
 export const formatYear = (date) => {
