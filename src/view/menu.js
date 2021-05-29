@@ -43,7 +43,7 @@ export default class Menu extends AbstractView {
 
   _filterTypeClickHandler(evt) {
     evt.preventDefault();
-    this._callback.filterTypeClick(evt.target.getAttribute('data-type'));
+    this._callback.filterTypeClick(evt.currentTarget.getAttribute('data-type'));
   }
 
   setFilterTypeClickHandler(callback) {
