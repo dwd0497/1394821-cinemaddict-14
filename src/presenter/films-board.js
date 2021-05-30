@@ -1,4 +1,4 @@
-import FilmPresenter from './film.js';
+import FilmPresenter, {State as FilmPresenterViewState} from './film.js';
 
 import SortView from '../view/sort.js';
 import FilmsContainerView from '../view/films-container.js';
@@ -101,7 +101,7 @@ export default class FilmsBoard {
     });
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _handleViewAction(actionType, updateType, update, callback, filmId) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update).then((response) => {
@@ -109,10 +109,18 @@ export default class FilmsBoard {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(updateType, update);
+        // this._filmPresenter[filmId].setViewState(FilmPresenterViewState.SAVING);
+        this._api.addComment(update, filmId).then((response) => {
+          this._commentsModel.addComment(updateType, response);
+          callback();
+        });
         break;
       case UserAction.DELETE_COMMENT:
-        this._commentsModel.deleteComment(updateType, update);
+        // this._filmPresenter[filmId].setViewState(FilmPresenterViewState.DELETING);
+        this._api.deleteComment(update).then(() => {
+          this._commentsModel.deleteComment(updateType, update);
+          callback();
+        });
         break;
     }
   }

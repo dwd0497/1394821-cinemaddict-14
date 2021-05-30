@@ -35,6 +35,9 @@ export default class Films extends Observer {
   }
 
   static adaptToClient(film) {
+    if (film.movie) {
+      return;
+    }
     const adaptedFilm = Object.assign(
       {},
       film,

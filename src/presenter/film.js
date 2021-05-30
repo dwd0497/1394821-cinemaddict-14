@@ -62,7 +62,7 @@ export default class Film {
     }
   }
 
-  _openPopup() {
+  _openPopup(position = 0) {
     this._handleDestroyPopup();
 
     const prevPopupComponent = this._popupComponent;
@@ -84,6 +84,7 @@ export default class Film {
         render(document.body, this._popupComponent);
       }
       document.body.classList.add('hide-overflow');
+      this._popupComponent.getElement().scrollTo(0, position);
     });
   }
 
@@ -140,22 +141,29 @@ export default class Film {
     );
   }
 
-  _handleFormSubmit(comment, commentsIds) {
+  _restorePopup(position) {
+    return () => {
+      this.destroyPopup();
+      this._openPopup(position);
+    };
+  }
+
+  _handleFormSubmit(comment, position) {
     this._changeData(
       UserAction.ADD_COMMENT,
       UpdateType.MINOR,
       comment,
+      this._restorePopup(position),
+      this._film.id,
     );
     this._changeData(
       UserAction.UPDATE,
       UpdateType.MINOR,
-      {...this._film, commentsIds: commentsIds},
+      {...this._film},
     );
-    this.destroyPopup();
-    this._openPopup();
   }
 
-  _handleDeleteClick(deletedCommentId, deletedComment) {
+  _handleDeleteClick(deletedCommentId, deletedComment, position) {
     const updatedCommentsIds = this._film.comments.filter((commentId) => commentId !== parseInt(deletedCommentId));
     this._changeData(
       UserAction.UPDATE_FILM,
@@ -166,9 +174,8 @@ export default class Film {
       UserAction.DELETE_COMMENT,
       UpdateType.MINOR,
       deletedComment,
+      this._restorePopup(position),
     );
-    this.destroyPopup();
-    this._openPopup();
   }
 
   _handleTextAreaInput(evt) {

@@ -2,7 +2,6 @@ import SmartView from './smart.js';
 import {emotions} from '../utils/consts.js';
 import he from 'he';
 import {convertMinutesToHours, formatDate, formatDateAndTime} from '../utils/common.js';
-import dayjs from 'dayjs';
 
 const getEmojisTemplate = (emotionsList) => {
   return emotionsList.map((emotion) => {
@@ -30,7 +29,7 @@ const getGenresTemplate = (genres) => {
 `);
 };
 
-const getCommentsTemplate = (comments) => {
+const getCommentsTemplate = (comments, isDeleting, isDisabled) => {
   return comments.map((comment) => {
     const {author, text, date, emotion, id} = comment;
     return (`
@@ -43,7 +42,7 @@ const getCommentsTemplate = (comments) => {
         <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
         <span class="film-details__comment-day">${formatDateAndTime(date)}</span>
-        <button class="film-details__comment-delete" id="${id}">Delete</button>
+        <button class="film-details__comment-delete" id="${id}" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleteing' : 'Delete'}</button>
         </p>
       </div>
     </li>
@@ -52,7 +51,7 @@ const getCommentsTemplate = (comments) => {
 };
 
 const createPopupTemplate = (data, comments) => {
-  const {title, originalTtitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment} = data;
+  const {title, originalTtitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment, isDisabled, isDeleting} = data;
 
   const addCheckAttribute = (flag) => {
     return flag ? 'checked' : '';
@@ -136,7 +135,7 @@ const createPopupTemplate = (data, comments) => {
                 <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
                 <ul class="film-details__comments-list">
-                  ${getCommentsTemplate(comments)}
+                  ${getCommentsTemplate(comments, isDeleting, isDisabled)}
                 </ul>
 
                 <div class="film-details__new-comment">
@@ -258,7 +257,7 @@ export default class Popup extends SmartView {
       item.addEventListener('click', this._deleteClickHandler);
     });
     this.getElement().querySelector('form').addEventListener('keydown', (evt) => {
-      if (evt.keyCode === 13 && (evt.ctrlKey || evt.metaKey)) {
+      if (evt.keyCode === 13 && (evt.ctrlKey || evt.metaKey) && !this._data.isSaving) {
         this._formSubmitHandler(evt);
       }
     });
@@ -267,16 +266,6 @@ export default class Popup extends SmartView {
 
   reset(film) {
     this.updateData(Popup.parseStateToData(film));
-  }
-
-  static parseDataToComment(data) {
-    return {
-      author: 'TestAuthor',
-      id: Date.now(),
-      text: data.text,
-      emotion: data.emoji,
-      date: dayjs().toDate(),
-    };
   }
 
   static parseDataToState(data) {
@@ -305,12 +294,7 @@ export default class Popup extends SmartView {
       return;
     }
 
-    const newComment = Popup.parseDataToComment(this._newComment);
-    const updatedCommentsIds = this._data.comments;
-
-    updatedCommentsIds.push(newComment.id);
-    this._callback.submit(newComment, updatedCommentsIds);
-    document.querySelector('.film-details').scrollTo(0, scrollPosition);
+    this._callback.submit(this._newComment, scrollPosition);
   }
 
   setDeleteClickHandler(callback) {
@@ -320,11 +304,9 @@ export default class Popup extends SmartView {
   _deleteClickHandler(evt) {
     evt.preventDefault();
     const scrollPosition = document.querySelector('.film-details').scrollTop;
-    const deletedCommentId = parseInt(evt.target.id);
+    const deletedCommentId = evt.target.id;
     const [deletedComment] = this._comments.filter((comment) => comment.id === deletedCommentId);
-    this._callback.delete(deletedCommentId, deletedComment);
-
-    document.querySelector('.film-details').scrollTo(0, scrollPosition);
+    this._callback.delete(deletedCommentId, deletedComment, scrollPosition);
   }
 
   setInputHandler() {

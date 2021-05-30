@@ -26,8 +26,7 @@ export default class Films extends Observer {
   }
 
   deleteComment(updateType, update) {
-    const index = this._comments.findIndex((comment) => comment.id === parseInt(update.id));
-
+    const index = this._comments.findIndex((comment) => comment.id === update.id);
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
@@ -63,12 +62,13 @@ export default class Films extends Observer {
       {},
       comment,
       {
+        emotion: comment.emoji,
         comment: comment.text,
       },
     );
 
-    delete adaptedComment.id;
-    delete adaptedComment.date;
+    delete adaptedComment.emoji;
+    delete adaptedComment.text;
 
     return adaptedComment;
   }

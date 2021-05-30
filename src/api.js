@@ -42,9 +42,9 @@ export default class Api {
       .then((comments) => comments.map(CommentsModel.adaptToClient));
   }
 
-  addComment(comment) {
+  addComment(comment, filmId) {
     return this._load({
-      url: 'comments',
+      url: `comments/${filmId}`,
       method: Method.POST,
       body: JSON.stringify(CommentsModel.adaptToServer(comment)),
       headers: new Headers({'Content-Type': 'application/json'}),
