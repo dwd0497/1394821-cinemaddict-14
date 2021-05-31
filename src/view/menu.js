@@ -12,23 +12,21 @@ const createMenuItemTemplate = (filter, currentFilterType) => {
   `);
 };
 
-const createMenuTemplate = (filters, currentFilterType, currentPage) => {
+const createMenuTemplate = (filters, currentFilterType) => {
   const menuItemsTemplate = filters.map((filter) => createMenuItemTemplate(filter, currentFilterType)).join('');
-
   return (`
     <nav class="main-navigation">
         <div class="main-navigation__items">
           ${menuItemsTemplate}
         </div>
-        <a href="#${currentPage.toLowerCase()}" class="main-navigation__additional" id="${currentPage}">${currentPage}</a>
+        <a href="#stats" class="main-navigation__additional" id="${PageType.FILMS}">Stats</a>
     </nav>
   `);
 };
 
 export default class Menu extends AbstractView {
-  constructor(filters, currentFilterType, currentPageType = PageType.FILMS) {
+  constructor(filters, currentFilterType) {
     super();
-    this._currentPage = currentPageType;
 
     this._currentFilterType = currentFilterType;
     this._filters = filters;
@@ -42,7 +40,6 @@ export default class Menu extends AbstractView {
   }
 
   _filterTypeClickHandler(evt) {
-    evt.preventDefault();
     this._callback.filterTypeClick(evt.currentTarget.getAttribute('data-type'));
   }
 
@@ -61,11 +58,14 @@ export default class Menu extends AbstractView {
     this.getElement().querySelector('.main-navigation__additional').addEventListener('click', this._pageTypeClickHandler);
   }
 
-  setPageType() {
-    this._currentPage === PageType.FILMS ? this._currentPage = PageType.STATS : this._currentPage = PageType.FILMS;
-    const pageTypeElement = this.getElement().querySelector('.main-navigation__additional');
-    pageTypeElement.id = this._currentPage;
-    pageTypeElement.textContent = this._currentPage;
-    pageTypeElement.href = `#${this._currentPage.toLowerCase()}`;
+  setPageType(pageType) {
+    const menuElement = this.getElement().querySelector('.main-navigation__additional')
+    if (pageType === PageType.STATS) {
+      menuElement.classList.add('main-navigation__additional--active');
+      menuElement.id = PageType.STATS;
+    } else {
+      menuElement.classList.remove('main-navigation__additional--active');
+      menuElement.id = PageType.FILMS;
+    }
   }
 }

@@ -1,4 +1,6 @@
 import Menu from '../view/menu.js';
+import StatView from '../view/stat.js';
+
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {filter} from '../utils/filter.js';
 import {FilterType, UpdateType} from '../utils/consts.js';
@@ -12,6 +14,7 @@ export default class Filter {
     this._filmsModel = filmsModel;
     this._boardPresenter = boardPresenter;
     this._filterComponent = null;
+    this._statComponent = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeClick = this._handleFilterTypeClick.bind(this);
@@ -21,36 +24,50 @@ export default class Filter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init(statComponent) {
+  init(mainElement) {
     const prevFilterComponent = this._filterComponent;
-    this._statComponent = statComponent;
+    const prevStatComponent = this._statComponent;
+
+    this._mainElement = mainElement;
+    this._statComponent = new StatView(this._getFilms());
     this._filterComponent = new Menu(this._getFilters(), this._filterModel.getFilter());
     this._filterComponent.setPageTypeClickHandler(this._handlePageTypeClick);
-
     this._filterComponent.setFilterTypeClickHandler(this._handleFilterTypeClick);
 
     if (prevFilterComponent === null) {
-      render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
-      return;
+      render(this._filterContainer, this._filterComponent, RenderPosition.AFTERBEGIN);
+    } else {
+      replace(this._filterComponent, prevFilterComponent);
     }
-    replace(this._filterComponent, prevFilterComponent);
-    remove(prevFilterComponent);
+
+    if (prevStatComponent === null) {
+      render(this._mainElement, this._statComponent);
+    } else {
+      replace(this._statComponent, prevStatComponent);
+    }
   }
 
   _handleModelEvent() {
-    this.init();
+    this.init(this._mainElement);
   }
 
   _handleFilterTypeClick(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
-      return;
+    if (this._filmsModel.getFilms().length) {
+      if (this._filterModel.getFilter() === filterType) {
+        return;
+      }
+      this._statComponent.hide();
+      this._boardPresenter.show();
+      this._filterModel.setFilter(UpdateType.MAJOR, filterType);
     }
+  }
 
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+  _getFilms() {
+    return this._filmsModel.getFilms();
   }
 
   _getFilters() {
-    const films = this._filmsModel.getFilms();
+    const films = this._getFilms();
 
     return [
       {
@@ -77,17 +94,20 @@ export default class Filter {
   }
 
   _handlePageTypeClick(pageItemType) {
-    switch (pageItemType) {
-      case PageType.FILMS:
-        this._filterComponent.setPageType();
-        this._boardPresenter.destroy();
-        this._statComponent.show();
-        break;
-      case PageType.STATS:
-        this._filterComponent.setPageType();
-        this._boardPresenter.init(this._commentsModel);
-        this._statComponent.hide();
-        break;
+    if (this._filmsModel.getFilms().length) {
+      switch (pageItemType) {
+        case PageType.FILMS:
+          this._filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+          this._filterComponent.setPageType(PageType.STATS);
+          this._statComponent.show();
+          this._boardPresenter.hide();
+          break;
+        case PageType.STATS:
+          this._filterComponent.setPageType(PageType.FILMS);
+          this._statComponent.hide();
+          this._boardPresenter.show();
+          break;
+      }
     }
   }
 }

@@ -5,40 +5,42 @@ import FilmsModel from './model/films.js';
 import CommentsModel from './model/comments.js';
 import FilterModel from './model/filter.js';
 
-import UserView from './view/user.js';
 import StatisticsView from './view/statistics.js';
-import StatView from './view/stat.js';
-
-import {generateFilm} from './mock/film.js';
-import {generateComments} from './mock/comment.js';
 
 import {render, RenderPosition} from './utils/render.js';
+import {UpdateType} from './utils/consts.js';
 
-const FILMS_COUNT = 20;
-const comments = generateComments();
+import Api from './api.js';
 
-const films = new Array(FILMS_COUNT).fill().map(() => generateFilm(comments));
+const AUTHORIZATION = 'Basic fdkoasngoinmo32mf';
+const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
+
+const api = new Api(END_POINT, AUTHORIZATION);
+
 
 const filmsModel = new FilmsModel();
-filmsModel.setFilms(films);
 
 const commentsModel = new CommentsModel();
-commentsModel.setComments(comments);
 
 const filterModel = new FilterModel();
 
-const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
+const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
 const statisticsElement = footerElement.querySelector('.footer__statistics');
 
-render(headerElement, new UserView());
-
-const filmsBoardPresenter = new FilmsBoardPresenter(mainElement, filmsModel, filterModel);
+const filmsBoardPresenter = new FilmsBoardPresenter(mainElement, filmsModel, filterModel, commentsModel, api);
 const filterPresenter = new FilterPresenter(mainElement, filterModel, filmsModel, filmsBoardPresenter, commentsModel);
-const statComponent = new StatView(films);
-filterPresenter.init(statComponent);
-filmsBoardPresenter.init(commentsModel);
-render(mainElement, statComponent);
 
-render(statisticsElement, new StatisticsView(films.length), RenderPosition.AFTEREND);
+filterPresenter.init(mainElement);
+filmsBoardPresenter.init(headerElement);
+
+api.getFilms()
+  .then((films) => {
+    filmsModel.setFilms(UpdateType.INIT, films);
+    const statisticsComponent = new StatisticsView(films.length);
+    render(statisticsElement, statisticsComponent, RenderPosition.AFTEREND);
+  })
+  .catch(() => {
+    filmsModel.setFilms(UpdateType.INIT, []);
+  });
