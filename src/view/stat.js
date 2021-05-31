@@ -85,7 +85,7 @@ const createStatTemplate = (data) => {
   const topGenre = genreCounts.length === 0 ? '' : genreCounts[0].genre;
 
   return (
-    `<section class="statistic">
+    `<section class="statistic visually-hidden">
     <p class="statistic__rank">
       Your rank
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">

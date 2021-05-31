@@ -38,7 +38,7 @@ export default class Filter {
   }
 
   _handleModelEvent() {
-    this.init();
+    this.init(this._statComponent);
   }
 
   _handleFilterTypeClick(filterType) {
@@ -84,7 +84,6 @@ export default class Filter {
         case PageType.FILMS:
           this._filterComponent.setPageType();
           this._boardPresenter.destroy();
-          debugger
           this._statComponent.show();
           break;
         case PageType.STATS:

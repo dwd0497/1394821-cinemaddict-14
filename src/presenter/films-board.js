@@ -109,14 +109,12 @@ export default class FilmsBoard {
         });
         break;
       case UserAction.ADD_COMMENT:
-        // this._filmPresenter[filmId].setViewState(FilmPresenterViewState.SAVING);
         this._api.addComment(update, filmId).then((response) => {
           this._commentsModel.addComment(updateType, response);
           callback();
         });
         break;
       case UserAction.DELETE_COMMENT:
-        // this._filmPresenter[filmId].setViewState(FilmPresenterViewState.DELETING);
         this._api.deleteComment(update).then(() => {
           this._commentsModel.deleteComment(updateType, update);
           callback();

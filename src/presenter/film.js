@@ -5,6 +5,11 @@ import {UserAction, UpdateType} from '../utils/consts.js';
 
 import {render, remove, replace} from '../utils/render.js';
 
+const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+};
+
 export default class Film {
   constructor(filmContainer, changeData, handleDestroyPopup, api) {
     this._api = api;
@@ -148,6 +153,23 @@ export default class Film {
     };
   }
 
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._popupComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._popupComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+    }
+  }
+
   _handleFormSubmit(comment, position) {
     this._changeData(
       UserAction.ADD_COMMENT,
@@ -161,21 +183,25 @@ export default class Film {
       UpdateType.MINOR,
       {...this._film},
     );
+    this.setViewState(State.SAVING);
+    this._popupComponent.getElement().scrollTo(0, position);
   }
 
   _handleDeleteClick(deletedCommentId, deletedComment, position) {
     const updatedCommentsIds = this._film.comments.filter((commentId) => commentId !== parseInt(deletedCommentId));
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.MINOR,
-      {...this._film, comments: updatedCommentsIds},
-    );
     this._changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.MINOR,
       deletedComment,
       this._restorePopup(position),
     );
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      {...this._film, comments: updatedCommentsIds},
+    );
+    this.setViewState(State.DELETING);
+    this._popupComponent.getElement().scrollTo(0, position);
   }
 
   _handleTextAreaInput(evt) {

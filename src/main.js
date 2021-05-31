@@ -30,24 +30,25 @@ const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 const footerElement = document.querySelector('.footer');
 const statisticsElement = footerElement.querySelector('.footer__statistics');
+const userComponent = new UserView();
+render(headerElement, userComponent);
 
-render(headerElement, new UserView());
 
 const filmsBoardPresenter = new FilmsBoardPresenter(mainElement, filmsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(mainElement, filterModel, filmsModel, filmsBoardPresenter, commentsModel);
-const statComponent = new StatView();
-filterPresenter.init(statComponent);
 filmsBoardPresenter.init(commentsModel);
-render(mainElement, statComponent);
 
 const statisticsComponent = new StatisticsView();
 render(statisticsElement, statisticsComponent, RenderPosition.AFTEREND);
 
 api.getFilms()
   .then((films) => {
+    const statComponent = new StatView(films, filmsModel);
+    render(mainElement, statComponent);
+    filterPresenter.init(statComponent);
     filmsModel.setFilms(UpdateType.INIT, films);
     replace(new StatisticsView(films.length), statisticsComponent);
-    replace(new StatView(films), statComponent);
+    replace(new UserView(films, filmsModel), userComponent);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);

@@ -14,13 +14,12 @@ const createMenuItemTemplate = (filter, currentFilterType) => {
 
 const createMenuTemplate = (filters, currentFilterType, currentPage) => {
   const menuItemsTemplate = filters.map((filter) => createMenuItemTemplate(filter, currentFilterType)).join('');
-
   return (`
     <nav class="main-navigation">
         <div class="main-navigation__items">
           ${menuItemsTemplate}
         </div>
-        <a href="#${currentPage.toLowerCase()}" class="main-navigation__additional" id="${currentPage}">${currentPage}</a>
+        <a href="#stats" class="main-navigation__additional ${currentPage === PageType.STATS ? 'main-navigation__additional--active' : ''}" id="${currentPage}">Stats</a>
     </nav>
   `);
 };
@@ -42,7 +41,6 @@ export default class Menu extends AbstractView {
   }
 
   _filterTypeClickHandler(evt) {
-    evt.preventDefault();
     this._callback.filterTypeClick(evt.currentTarget.getAttribute('data-type'));
   }
 
@@ -65,7 +63,6 @@ export default class Menu extends AbstractView {
     this._currentPage === PageType.FILMS ? this._currentPage = PageType.STATS : this._currentPage = PageType.FILMS;
     const pageTypeElement = this.getElement().querySelector('.main-navigation__additional');
     pageTypeElement.id = this._currentPage;
-    pageTypeElement.textContent = this._currentPage;
-    pageTypeElement.href = `#${this._currentPage.toLowerCase()}`;
+    pageTypeElement.classList.toggle('main-navigation__additional--active');
   }
 }
