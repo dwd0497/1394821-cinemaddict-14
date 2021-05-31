@@ -1,7 +1,7 @@
 import Menu from '../view/menu.js';
 import StatView from '../view/stat.js';
 
-import {render, RenderPosition, replace, remove} from '../utils/render.js';
+import {render, RenderPosition, replace} from '../utils/render.js';
 import {filter} from '../utils/filter.js';
 import {FilterType, UpdateType} from '../utils/consts.js';
 import {PageType} from '../utils/consts.js';

@@ -59,7 +59,7 @@ export default class Menu extends AbstractView {
   }
 
   setPageType(pageType) {
-    const menuElement = this.getElement().querySelector('.main-navigation__additional')
+    const menuElement = this.getElement().querySelector('.main-navigation__additional');
     if (pageType === PageType.STATS) {
       menuElement.classList.add('main-navigation__additional--active');
       menuElement.id = PageType.STATS;
