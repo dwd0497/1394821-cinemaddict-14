@@ -43,13 +43,16 @@ export default class Menu extends AbstractView {
     this._callback.filterTypeClick(evt.currentTarget.getAttribute('data-type'));
   }
 
+  deleteActiveClass() {
+    this.getElement().querySelectorAll('.main-navigation__item').forEach((element) => element.classList.remove('main-navigation__item--active'));
+  }
+
   setFilterTypeClickHandler(callback) {
     this._callback.filterTypeClick = callback;
     this.getElement().querySelectorAll('.main-navigation__item').forEach((element) => element.addEventListener('click', this._filterTypeClickHandler));
   }
 
   _pageTypeClickHandler(evt) {
-    evt.preventDefault();
     this._callback.pageTypeClick(evt.target.id);
   }
 

@@ -97,7 +97,7 @@ export default class Filter {
     if (this._filmsModel.getFilms().length) {
       switch (pageItemType) {
         case PageType.FILMS:
-          this._filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+          this._filterComponent.deleteActiveClass();
           this._filterComponent.setPageType(PageType.STATS);
           this._statComponent.show();
           this._boardPresenter.hide();

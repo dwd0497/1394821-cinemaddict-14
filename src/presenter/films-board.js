@@ -16,6 +16,8 @@ import {sortByRating, sortByDate} from '../utils/common.js';
 import {SortType, UpdateType, UserAction} from '../utils/consts.js';
 import {filter} from '../utils/filter.js';
 
+import {State as FilmPresenterViewState} from './film.js'
+
 const DEFAULT_FILMS_COUNT = 5;
 const FILM_COUNT_PER_STEP = 5;
 const SPECIAL_FILMS_COUNT = 2;
@@ -115,12 +117,16 @@ export default class FilmsBoard {
         this._api.addComment(update, filmId).then((response) => {
           this._commentsModel.addComment(updateType, response);
           callback();
+        }).catch(() => {
+          this._filmPresenter[filmId].setViewState(FilmPresenterViewState.ABORTING_SAVING);
         });
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update).then(() => {
           this._commentsModel.deleteComment(updateType, update);
           callback();
+        }).catch(() => {
+          this._filmPresenter[filmId].setViewState(FilmPresenterViewState.ABORTING_DELETING, update);
         });
         break;
     }

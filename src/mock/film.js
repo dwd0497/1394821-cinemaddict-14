@@ -85,9 +85,9 @@ export const generateFilm = () => {
   return {
     id: nanoid(),
     title: getRandomArrayValue(titles),
-    originalTtitle: getRandomArrayValue(titles),
+    originalTitle: getRandomArrayValue(titles),
     poster: getRandomArrayValue(postersSrc),
-    fullcreanPoster: getRandomArrayValue(postersSrc),
+    fullscreenPoster: getRandomArrayValue(postersSrc),
     rating: getRandomIntInclusive(0, 10),
     ageRating: getRandomIntInclusive(0, 18),
     releaseDate: getRandomDate(),

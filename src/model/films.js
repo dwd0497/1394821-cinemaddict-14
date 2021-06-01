@@ -43,9 +43,9 @@ export default class Films extends Observer {
       {
         id: film.id,
         title: film.film_info.title,
-        originalTtitle: film.film_info.alternative_title,
+        originalTitle: film.film_info.alternative_title,
         poster: film.film_info.poster,
-        fullcreanPoster: film.film_info.poster,
+        fullscreenPoster: film.film_info.poster,
         rating: film.film_info.total_rating,
         ageRating: film.film_info.age_rating,
         releaseDate: new Date(film.film_info.release.date),
@@ -80,7 +80,7 @@ export default class Films extends Observer {
         id: film.id,
         'film_info': {
           title: film.title,
-          'alternative_title': film.originalTtitle,
+          'alternative_title': film.originalTitle,
           'total_rating': film.rating,
           poster: film.poster,
           'age_rating': film.ageRating,
@@ -105,9 +105,9 @@ export default class Films extends Observer {
     );
 
     delete film.title;
-    delete film.originalTtitle;
+    delete film.originalTitle;
     delete film.poster;
-    delete film.fullcreanPoster;
+    delete film.fullscreenPoster;
     delete film.rating;
     delete film.ageRating;
     delete film.releaseDate;

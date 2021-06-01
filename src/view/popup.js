@@ -5,10 +5,10 @@ import {convertMinutesToHours, formatDate, formatDateAndTime} from '../utils/com
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
-const getEmojisTemplate = (emotionsList) => {
+const getEmojisTemplate = (emotionsList, selectedEmotion) => {
   return emotionsList.map((emotion) => {
     return (`
-      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
+      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${selectedEmotion === emotion ? 'checked' : ''}>
       <label class="film-details__emoji-label" for="emoji-${emotion}">
           <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
       </label>
@@ -31,11 +31,11 @@ const getGenresTemplate = (genres) => {
 `);
 };
 
-const getCommentsTemplate = (comments, isDeleting, isDisabled) => {
+const getCommentsTemplate = (comments, isDisabled) => {
   return comments.map((comment) => {
     const {author, text, date, emotion, id} = comment;
     return (`
-    <li class="film-details__comment">
+    <li class="film-details__comment" id="comment-${id}">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
       </span>
@@ -44,7 +44,7 @@ const getCommentsTemplate = (comments, isDeleting, isDisabled) => {
         <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
         <span class="film-details__comment-day">${formatDateAndTime(date)}</span>
-        <button class="film-details__comment-delete" id="${id}" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleteing' : 'Delete'}</button>
+        <button class="film-details__comment-delete" id="${id}" ${isDisabled ? 'disabled' : ''}>Delete</button>
         </p>
       </div>
     </li>
@@ -53,7 +53,7 @@ const getCommentsTemplate = (comments, isDeleting, isDisabled) => {
 };
 
 const createPopupTemplate = (data, comments) => {
-  const {title, originalTtitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment, isDisabled, isDeleting} = data;
+  const {title, originalTitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment, isDisabled} = data;
 
   const addCheckAttribute = (flag) => {
     return flag ? 'checked' : '';
@@ -77,7 +77,7 @@ const createPopupTemplate = (data, comments) => {
                     <div class="film-details__info-head">
                     <div class="film-details__title-wrap">
                         <h3 class="film-details__title">${title}</h3>
-                        <p class="film-details__title-original">${originalTtitle}</p>
+                        <p class="film-details__title-original">${originalTitle}</p>
                     </div>
 
                     <div class="film-details__rating">
@@ -91,12 +91,12 @@ const createPopupTemplate = (data, comments) => {
                         <td class="film-details__cell">${producer}</td>
                     </tr>
                     <tr class="film-details__row">
-                        <td class="film-details__term">${screenwriters}</td>
-                        <td class="film-details__cell">Anne Wigton, Heinz Herald, Richard Weil</td>
+                        <td class="film-details__term">Writers</td>
+                        <td class="film-details__cell">${screenwriters.join(', ')}</td>
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Actors</td>
-                        <td class="film-details__cell">${cast}</td>
+                        <td class="film-details__cell">${cast.join(', ')}</td>
                     </tr>
                     <tr class="film-details__row">
                         <td class="film-details__term">Release Date</td>
@@ -137,7 +137,7 @@ const createPopupTemplate = (data, comments) => {
                 <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
                 <ul class="film-details__comments-list">
-                  ${getCommentsTemplate(comments, isDeleting, isDisabled)}
+                  ${getCommentsTemplate(comments, isDisabled)}
                 </ul>
 
                 <div class="film-details__new-comment">
@@ -148,7 +148,7 @@ const createPopupTemplate = (data, comments) => {
                     <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
                     </label>
                     <div class="film-details__emoji-list">
-                      ${getEmojisTemplate(emotions)}
+                      ${getEmojisTemplate(emotions, selectedEmotion)}
                     </div>
                 </div>
                 </section>
@@ -288,7 +288,7 @@ export default class Popup extends SmartView {
   }
 
   _formSubmitHandler(evt) {
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
+    const scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     const {text, emoji} = this._newComment;
 
@@ -305,7 +305,8 @@ export default class Popup extends SmartView {
 
   _deleteClickHandler(evt) {
     evt.preventDefault();
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
+    evt.target.textContent = 'Deleting';
+    const scrollPosition = this.getElement().scrollTop;
     const deletedCommentId = evt.target.id;
     const deletedComment = this._comments.filter((comment) => comment.id === deletedCommentId)[0];
     this._callback.delete(deletedComment, scrollPosition);
@@ -322,18 +323,22 @@ export default class Popup extends SmartView {
   }
 
   shakePopup(callback) {
+    const scrollPosition = this.getElement().scrollTop;
     this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
     setTimeout(() => {
       this.getElement().style.animation = '';
       callback();
+      this.getElement().scrollTo(0, scrollPosition);
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
-  shakeComment(callback) {
-    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+  shakeComment(callback, commentId) {
+    const scrollPosition = this.getElement().scrollTop;
+    this.getElement().querySelector(`#comment-${commentId}`).style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
     setTimeout(() => {
       this.getElement().style.animation = '';
       callback();
+      this.getElement().scrollTo(0, scrollPosition);
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 }

@@ -5,7 +5,7 @@ import {UserAction, UpdateType} from '../utils/consts.js';
 
 import {render, remove, replace} from '../utils/render.js';
 
-const State = {
+export const State = {
   SAVING: 'SAVING',
   DELETING: 'DELETING',
   ABORTING_SAVING: 'ABORTING_SAVING',
@@ -127,7 +127,7 @@ export default class Film {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      UpdateType.MAJOR,
       Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}),
     );
   }
@@ -135,7 +135,7 @@ export default class Film {
   _handleWatchedClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      UpdateType.MAJOR,
       Object.assign({}, this._film, {isWatched: !this._film.isWatched}),
     );
   }
@@ -143,7 +143,7 @@ export default class Film {
   _handleWatchlistClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      UpdateType.MAJOR,
       Object.assign({}, this._film, {isInWatchlist: !this._film.isInWatchlist}),
     );
   }
@@ -155,7 +155,7 @@ export default class Film {
     };
   }
 
-  setViewState(state) {
+  setViewState(state, comment) {
     const resetFormState = () => {
       this._popupComponent.updateData({
         isDisabled: false,
@@ -171,17 +171,11 @@ export default class Film {
           isSaving: true,
         });
         break;
-      case State.DELETING:
-        this._popupComponent.updateData({
-          isDisabled: true,
-          isDeleting: true,
-        });
-        break;
       case State.ABORTING_SAVING:
         this._popupComponent.shakePopup(resetFormState);
         break;
       case State.ABORTING_DELETING:
-        this._popupComponent.shakeComment(resetFormState);
+        this._popupComponent.shakeComment(resetFormState, comment.id);
         break;
     }
   }
@@ -209,13 +203,13 @@ export default class Film {
       UpdateType.MINOR,
       deletedComment,
       this._restorePopup(position),
+      this._film.id,
     );
     this._changeData(
       UserAction.UPDATE_FILM,
       UpdateType.MINOR,
       {...this._film},
     );
-    this.setViewState(State.DELETING);
     this._popupComponent.getElement().scrollTo(0, position);
   }
 
