@@ -16,7 +16,7 @@ import {sortByRating, sortByDate} from '../utils/common.js';
 import {SortType, UpdateType, UserAction} from '../utils/consts.js';
 import {filter} from '../utils/filter.js';
 
-import {State as FilmPresenterViewState} from './film.js'
+import {State as FilmPresenterViewState} from './film.js';
 
 const DEFAULT_FILMS_COUNT = 5;
 const FILM_COUNT_PER_STEP = 5;
