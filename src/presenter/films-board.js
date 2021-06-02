@@ -72,9 +72,11 @@ export default class FilmsBoard {
 
     switch (this._currentSortType) {
       case SortType.DATE:
-        return filtredFilms.sort(sortByDate);
+        return filtredFilms.slice().sort(sortByDate);
       case SortType.RATING:
-        return filtredFilms.sort(sortByRating);
+        return filtredFilms.slice().sort(sortByRating);
+      case SortType.DEFAULT:
+        return filtredFilms;
     }
 
     return filtredFilms;
@@ -95,7 +97,7 @@ export default class FilmsBoard {
     });
   }
 
-  _handleViewAction(actionType, updateType, update, callback, filmId) {
+  _handleViewAction(actionType, updateType, update, callback, film) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update).then((response) => {
@@ -103,19 +105,20 @@ export default class FilmsBoard {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._api.addComment(update, filmId).then((response) => {
+        this._api.addComment(update, film.id).then((response) => {
           this._commentsModel.addComment(updateType, response);
           callback();
         }).catch(() => {
-          this._filmPresenter[filmId].setViewState(FilmPresenterViewState.ABORTING_SAVING);
+          this._filmPresenter[film.id].setViewState(FilmPresenterViewState.ABORTING_SAVING);
         });
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update).then(() => {
           this._commentsModel.deleteComment(updateType, update);
+          this._filmsModel.updateFilm(updateType, film);
           callback();
         }).catch(() => {
-          this._filmPresenter[filmId].setViewState(FilmPresenterViewState.ABORTING_DELETING, update);
+          this._filmPresenter[film.id].setViewState(FilmPresenterViewState.ABORTING_DELETING, update);
         });
         break;
     }
@@ -140,6 +143,7 @@ export default class FilmsBoard {
         this._renderFilmsBoard();
         break;
       case UpdateType.MAJOR:
+        this._currentSortType = SortType.DEFAULT;
         this._clearFilmsBoard({resetRenderedTasksCount: true, resetSortType: true});
         this._renderFilmsBoard();
         break;

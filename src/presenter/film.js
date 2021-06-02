@@ -127,7 +127,7 @@ export default class Film {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}),
     );
   }
@@ -135,7 +135,7 @@ export default class Film {
   _handleWatchedClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       Object.assign({}, this._film, {isWatched: !this._film.isWatched}),
     );
   }
@@ -143,7 +143,7 @@ export default class Film {
   _handleWatchlistClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       Object.assign({}, this._film, {isInWatchlist: !this._film.isInWatchlist}),
     );
   }
@@ -152,6 +152,13 @@ export default class Film {
     return () => {
       this.destroyPopup();
       this._openPopup(position);
+    };
+  }
+
+  _deleteComment(deletedCommentElement) {
+    return () => {
+      deletedCommentElement.remove();
+      this._popupComponent.recalculateCommentsCount();
     };
   }
 
@@ -186,7 +193,7 @@ export default class Film {
       UpdateType.MINOR,
       comment,
       this._restorePopup(position),
-      this._film.id,
+      this._film,
     );
     this._changeData(
       UserAction.UPDATE_FILM,
@@ -197,20 +204,19 @@ export default class Film {
     this._popupComponent.getElement().scrollTo(0, position);
   }
 
-  _handleDeleteClick(deletedComment, position) {
+  _handleDeleteClick(deletedComment, deletedCommentElement) {
     this._changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.MINOR,
       deletedComment,
-      this._restorePopup(position),
-      this._film.id,
+      this._deleteComment(deletedCommentElement),
+      {...this._film, comments: this._film.comments.filter((id) => id !== deletedComment.id)},
     );
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.MINOR,
-      {...this._film},
-    );
-    this._popupComponent.getElement().scrollTo(0, position);
+    // this._changeData(
+    //   UserAction.UPDATE_FILM,
+    //   UpdateType.MINOR,
+    //   {...this._film, comments: this._film.comments.filter((id) => id !== deletedComment.id)},
+    // );
   }
 
   _handleTextAreaInput(evt) {

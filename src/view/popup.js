@@ -142,7 +142,6 @@ const createPopupTemplate = (data, comments) => {
 
                 <div class="film-details__new-comment">
                     <div class="film-details__add-emoji-label">
-                      ${selectedEmotion ? '<img src="images/emoji/' + selectedEmotion + '.png" width="55" height="55" alt="emoji-' + selectedEmotion + '"></img>' : ''}
                     </div>
                     <label class="film-details__comment-label">
                     <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
@@ -191,10 +190,8 @@ export default class Popup extends SmartView {
   _emotionChangeHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName !== 'LABEL') {
-      const currentOffset = this.getElement().scrollTop;
-      this.updateData({selectedEmotion: evt.target.value});
+      this.getElement().querySelector('.film-details__add-emoji-label').innerHTML = `<img src="images/emoji/${evt.target.value}.png" width="55" height="55" alt="emoji-${evt.target.value}">`;
       this._newComment.emoji = evt.target.value;
-      this.getElement().scrollBy(0, currentOffset);
     }
   }
 
@@ -303,13 +300,18 @@ export default class Popup extends SmartView {
     this._callback.delete = callback;
   }
 
+  recalculateCommentsCount() {
+    const commentsCountElement = this.getElement().querySelector('.film-details__comments-count');
+    commentsCountElement.textContent = parseInt(commentsCountElement.textContent) - 1;
+  }
+
   _deleteClickHandler(evt) {
     evt.preventDefault();
     evt.target.textContent = 'Deleting';
-    const scrollPosition = this.getElement().scrollTop;
     const deletedCommentId = evt.target.id;
     const deletedComment = this._comments.filter((comment) => comment.id === deletedCommentId)[0];
-    this._callback.delete(deletedComment, scrollPosition);
+    const deletedCommentElement = this.getElement().querySelector(`#comment-${deletedComment.id}`);
+    this._callback.delete(deletedComment, deletedCommentElement);
   }
 
   setInputHandler() {
