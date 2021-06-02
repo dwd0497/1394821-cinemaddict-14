@@ -154,10 +154,12 @@ export default class Stat extends SmartView {
   }
 
   _timeIntervalChangeHandler(evt) {
+
     this._currentStatPeriod = evt.target.value;
     this.updateData({
       statPeriod: this._currentStatPeriod,
     });
+    this.show();
   }
 
   _setInnersHandler() {
