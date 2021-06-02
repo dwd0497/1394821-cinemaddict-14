@@ -75,8 +75,6 @@ export default class FilmsBoard {
         return filtredFilms.slice().sort(sortByDate);
       case SortType.RATING:
         return filtredFilms.slice().sort(sortByRating);
-      case SortType.DEFAULT:
-        return filtredFilms;
     }
 
     return filtredFilms;
@@ -97,7 +95,7 @@ export default class FilmsBoard {
     });
   }
 
-  _handleViewAction(actionType, updateType, update, callback, film) {
+  _handleViewAction(actionType, updateType, update, callback, film, filmPresenter) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update).then((response) => {
@@ -106,10 +104,11 @@ export default class FilmsBoard {
         break;
       case UserAction.ADD_COMMENT:
         this._api.addComment(update, film.id).then((response) => {
-          this._commentsModel.addComment(updateType, response);
-          callback();
+          this._commentsModel.addComment(updateType, response.comment);
+          this._filmsModel.updateFilm(updateType, response.film);
+          callback(response.comment);
         }).catch(() => {
-          this._filmPresenter[film.id].setViewState(FilmPresenterViewState.ABORTING_SAVING);
+          filmPresenter.setViewState(FilmPresenterViewState.ABORTING_SAVING);
         });
         break;
       case UserAction.DELETE_COMMENT:

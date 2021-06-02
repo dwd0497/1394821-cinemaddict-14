@@ -86,6 +86,7 @@ export default class Film {
       this._popupComponent.setFilmWatchlistHandler(this._handleWatchlistClick);
       this._popupComponent.setCloseClickHandler(this._handleCloseClick);
 
+      this._addComment = this._addComment.bind(this._popupComponent);
       this._isPopupOpen = true;
       if (prevPopupComponent === null) {
         render(document.body, this._popupComponent);
@@ -158,8 +159,13 @@ export default class Film {
   _deleteComment(deletedCommentElement) {
     return () => {
       deletedCommentElement.remove();
-      this._popupComponent.recalculateCommentsCount();
+      this._popupComponent.recalculateCommentsCount(false);
     };
+  }
+
+  _addComment(comment) {
+    this.recalculateCommentsCount(true);
+    this.addNewComment(comment);
   }
 
   setViewState(state, comment) {
@@ -187,21 +193,15 @@ export default class Film {
     }
   }
 
-  _handleFormSubmit(comment, position) {
+  _handleFormSubmit(comment) {
     this._changeData(
       UserAction.ADD_COMMENT,
       UpdateType.MINOR,
       comment,
-      this._restorePopup(position),
+      this._addComment,
       this._film,
+      this,
     );
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.MINOR,
-      {...this._film},
-    );
-    this.setViewState(State.SAVING);
-    this._popupComponent.getElement().scrollTo(0, position);
   }
 
   _handleDeleteClick(deletedComment, deletedCommentElement) {
@@ -212,11 +212,6 @@ export default class Film {
       this._deleteComment(deletedCommentElement),
       {...this._film, comments: this._film.comments.filter((id) => id !== deletedComment.id)},
     );
-    // this._changeData(
-    //   UserAction.UPDATE_FILM,
-    //   UpdateType.MINOR,
-    //   {...this._film, comments: this._film.comments.filter((id) => id !== deletedComment.id)},
-    // );
   }
 
   _handleTextAreaInput(evt) {

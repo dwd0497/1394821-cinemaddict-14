@@ -2,6 +2,7 @@ import SmartView from './smart.js';
 import {emotions} from '../utils/consts.js';
 import he from 'he';
 import {convertMinutesToHours, formatDate, formatDateAndTime} from '../utils/common.js';
+import {RenderPosition} from '../utils/render.js';
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
@@ -53,7 +54,7 @@ const getCommentsTemplate = (comments, isDisabled) => {
 };
 
 const createPopupTemplate = (data, comments) => {
-  const {title, originalTitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment, isDisabled} = data;
+  const {title, originalTitle, rating, ageRating, producer, screenwriters, cast, releaseDate, country, duration, genres, poster, description, isWatched, isFavorite, isInWatchlist, selectedEmotion, comment, isDisabled, emotion} = data;
 
   const addCheckAttribute = (flag) => {
     return flag ? 'checked' : '';
@@ -142,6 +143,7 @@ const createPopupTemplate = (data, comments) => {
 
                 <div class="film-details__new-comment">
                     <div class="film-details__add-emoji-label">
+                    ${emotion ? '<img src="images/emoji/' + emotion + '.png" width="55" height="55" alt="emoji-' + emotion + '">' : ''}
                     </div>
                     <label class="film-details__comment-label">
                     <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
@@ -192,6 +194,9 @@ export default class Popup extends SmartView {
     if (evt.target.tagName !== 'LABEL') {
       this.getElement().querySelector('.film-details__add-emoji-label').innerHTML = `<img src="images/emoji/${evt.target.value}.png" width="55" height="55" alt="emoji-${evt.target.value}">`;
       this._newComment.emoji = evt.target.value;
+      this.updateData({
+        emotion: evt.target.value,
+      }, true);
     }
   }
 
@@ -285,7 +290,6 @@ export default class Popup extends SmartView {
   }
 
   _formSubmitHandler(evt) {
-    const scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     const {text, emoji} = this._newComment;
 
@@ -293,16 +297,41 @@ export default class Popup extends SmartView {
       return;
     }
 
-    this._callback.submit(this._newComment, scrollPosition);
+    this._callback.submit(this._newComment);
   }
 
   setDeleteClickHandler(callback) {
     this._callback.delete = callback;
   }
 
-  recalculateCommentsCount() {
+  addNewComment(comment) {
+    const {id, emotion, text, author, date} = comment;
+    this.getElement().querySelector('.film-details__comments-list').insertAdjacentHTML(RenderPosition.BEFOREEND, `
+    <li class="film-details__comment" id="comment-${id}">
+    <span class="film-details__comment-emoji">
+      <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
+    </span>
+    <div>
+      <p class="film-details__comment-text">${text}</p>
+      <p class="film-details__comment-info">
+      <span class="film-details__comment-author">${author}</span>
+      <span class="film-details__comment-day">${formatDateAndTime(date)}</span>
+      <button class="film-details__comment-delete" id="${id}">Delete</button>
+      </p>
+    </div>
+  </li>
+    `);
+    this.getElement().querySelector('.film-details__add-emoji-label').innerHTML = '';
+    this.getElement().querySelector('.film-details__comment-input').value = '';
+    this.getElement().querySelectorAll('.film-details__emoji-item').forEach((item) => item.checked = false);
+    this._comments.push(comment);
+    this.restoreHandlers();
+  }
+
+  recalculateCommentsCount(isCountAdd) {
+    const summand = isCountAdd ? 1 : -1;
     const commentsCountElement = this.getElement().querySelector('.film-details__comments-count');
-    commentsCountElement.textContent = parseInt(commentsCountElement.textContent) - 1;
+    commentsCountElement.textContent = parseInt(commentsCountElement.textContent) + summand;
   }
 
   _deleteClickHandler(evt) {
