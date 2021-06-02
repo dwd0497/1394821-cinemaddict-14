@@ -18,7 +18,6 @@ import {State as FilmPresenterViewState} from './film.js';
 
 const DEFAULT_FILMS_COUNT = 5;
 const FILM_COUNT_PER_STEP = 5;
-const SPECIAL_FILMS_COUNT = 2;
 
 export default class FilmsBoard {
   constructor(filmsBoardContainer, filmsModel, filterModel, commentsModel, api) {
