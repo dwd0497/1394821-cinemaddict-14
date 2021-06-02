@@ -3,8 +3,6 @@ import FilmPresenter from './film.js';
 import SortView from '../view/sort.js';
 import FilmsContainerView from '../view/films-container.js';
 import DefaultFilmsView from '../view/default-films.js';
-import RatedFilmsView from '../view/rated-films';
-import CommentedFilmsView from '../view/commented-films.js';
 import NoFilmView from '../view/no-film.js';
 import FilmsView from '../view/films.js';
 import ShowMoreView from '../view/show-more.js';
@@ -30,8 +28,6 @@ export default class FilmsBoard {
     this._filterModel = filterModel;
     this._filmsBoardContainer = filmsBoardContainer;
     this._filmPresenter = {};
-    this._filmPresenterRated = {};
-    this._filmPresenterCommented = {};
     this._currentSortType = SortType.DEFAULT;
     this._isLoading = true;
 
@@ -98,12 +94,6 @@ export default class FilmsBoard {
     Object.values(this._filmPresenter).forEach((presenter) => {
       presenter.destroyPopup();
     });
-    Object.values(this._filmPresenterRated).forEach((presenter) => {
-      presenter.destroyPopup();
-    });
-    Object.values(this._filmPresenterCommented).forEach((presenter) => {
-      presenter.destroyPopup();
-    });
   }
 
   _handleViewAction(actionType, updateType, update, callback, filmId) {
@@ -143,12 +133,6 @@ export default class FilmsBoard {
       case UpdateType.PATCH:
         if (this._filmPresenter[data.id]) {
           this._filmPresenter[data.id].init(data, this._commentsModel);
-        }
-        if (this._filmPresenterRated[data.id]) {
-          this._filmPresenterRated[data.id].init(data, this._commentsModel);
-        }
-        if (this._filmPresenterCommented[data.id]) {
-          this._filmPresenterCommented[data.id].init(data, this._commentsModel);
         }
         this._replaceOldUserComponent();
         break;
@@ -195,18 +179,6 @@ export default class FilmsBoard {
     this._filmPresenter[film.id] = filmPresenter;
   }
 
-  _renderRatedFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup, this._api);
-    filmPresenter.init(film, this._commentsModel);
-    this._filmPresenterRated[film.id] = filmPresenter;
-  }
-
-  _renderCommentedFilm(film, container) {
-    const filmPresenter = new FilmPresenter(container, this._handleViewAction, this._handleDestroyPopup, this._api);
-    filmPresenter.init(film, this._commentsModel);
-    this._filmPresenterCommented[film.id] = filmPresenter;
-  }
-
   _renderFilmsContainer(container) {
     const filmsContainerComponent = new FilmsContainerView();
     render(container, filmsContainerComponent);
@@ -226,26 +198,6 @@ export default class FilmsBoard {
     const container = this._defaultFilmsContainer = this._renderFilmsContainer(this._defaultFilmsComponent);
     const filmsCount = this._getFilms().length;
     this._renderSeveralFilms(this._getFilms().slice(0, Math.min(filmsCount, DEFAULT_FILMS_COUNT)), container);
-  }
-
-  _renderRatedFilms() {
-    const filmsContainer = this._renderFilmsContainer(this._ratedFilmsComponent);
-
-    const ratedFilms = this._getFilms().slice(0, SPECIAL_FILMS_COUNT);
-
-    for (let i = 0; i < Math.min(ratedFilms.length, SPECIAL_FILMS_COUNT); i++) {
-      this._renderRatedFilm(ratedFilms[i], filmsContainer);
-    }
-  }
-
-  _renderCommentedFilms() {
-    const filmsContainer = this._renderFilmsContainer(this._commentedFilmsComponent);
-
-    const commentedFilms = this._getFilms().slice(0, SPECIAL_FILMS_COUNT);
-
-    for (let i = 0; i < Math.min(commentedFilms.length, SPECIAL_FILMS_COUNT); i++) {
-      this._renderCommentedFilm(commentedFilms[i], filmsContainer);
-    }
   }
 
   _handleShowMoreClick() {
@@ -293,8 +245,6 @@ export default class FilmsBoard {
     remove(this._loadingComponent);
     remove(this._showMoreComponent);
     remove(this._defaultFilmsComponent);
-    remove(this._ratedFilmsComponent);
-    remove(this._commentedFilmsComponent);
     remove(this._userComponent);
 
     this._userComponent = null;
@@ -339,21 +289,15 @@ export default class FilmsBoard {
     }
 
     this._defaultFilmsComponent = new DefaultFilmsView();
-    this._ratedFilmsComponent = new RatedFilmsView();
-    this._commentedFilmsComponent = new CommentedFilmsView();
 
     if (filmCount === 0) {
       this._renderNoFilm();
     } else {
       render(this._filmsBoardComponent, this._defaultFilmsComponent);
-      render(this._filmsBoardComponent, this._ratedFilmsComponent);
-      render(this._filmsBoardComponent, this._commentedFilmsComponent);
     }
 
     this._renderSort();
     this._renderDefaultFilms();
     this._renderShowMore();
-    this._renderRatedFilms();
-    this._renderCommentedFilms();
   }
 }

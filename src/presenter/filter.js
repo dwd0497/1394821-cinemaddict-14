@@ -15,6 +15,7 @@ export default class Filter {
     this._boardPresenter = boardPresenter;
     this._filterComponent = null;
     this._statComponent = null;
+    this._currentPage = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeClick = this._handleFilterTypeClick.bind(this);
@@ -53,9 +54,10 @@ export default class Filter {
 
   _handleFilterTypeClick(filterType) {
     if (this._filmsModel.getFilms().length) {
-      if (this._filterModel.getFilter() === filterType) {
+      if (this._filterModel.getFilter() === filterType && this._currentPage !== PageType.STATS) {
         return;
       }
+      this._currentPage = PageType.FILMS;
       this._statComponent.hide();
       this._boardPresenter.show();
       this._filterModel.setFilter(UpdateType.MAJOR, filterType);
@@ -94,18 +96,20 @@ export default class Filter {
   }
 
   _handlePageTypeClick(pageItemType) {
-    if (this._filmsModel.getFilms().length) {
+    if (this._filmsModel.getFilms().length && this._currentPage !== PageType.STATS) {
       switch (pageItemType) {
         case PageType.FILMS:
           this._filterComponent.deleteActiveClass();
           this._filterComponent.setPageType(PageType.STATS);
           this._statComponent.show();
           this._boardPresenter.hide();
+          this._currentPage = PageType.STATS;
           break;
         case PageType.STATS:
           this._filterComponent.setPageType(PageType.FILMS);
           this._statComponent.hide();
           this._boardPresenter.show();
+          this._currentPage = PageType.FILMS;
           break;
       }
     }
